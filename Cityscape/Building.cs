@@ -51,7 +51,9 @@ namespace Cityscape
             List<VertexPositionNormalTexture> listVert = new List<VertexPositionNormalTexture>();
             List<Int16> listIndex = new List<Int16>();
 
-            AddBox(ref listVert, ref listIndex, new Vector3(0.0f, 0.0f, 0.0f), new Vector3(1.0f, 1.0f, 1.0f));
+            AddBox(ref listVert, ref listIndex, new Vector3(0.0f, -1.0f, 0.0f), new Vector3(2.0f, 0.1f, 2.0f));
+
+            AddBox(ref listVert, ref listIndex, new Vector3(0.0f, 0.0f, 0.0f), new Vector3(1.0f, 2.0f, 1.0f));
 
             updateGeometry(listVert, listIndex);
 
@@ -126,7 +128,7 @@ namespace Cityscape
 
             // These should really go in a utility function later
             Vector3 forward = new Vector3(0.0f, 0.0f, 1.0f);
-            Vector3 back    = new Vector3(0.0f, 0.0f, -1.0f);
+            Vector3 back = new Vector3(0.0f, 0.0f, -1.0f);
             Vector3 left    = new Vector3(-1.0f, 0.0f, 0.0f);
             Vector3 right   = new Vector3(1.0f, 0.0f, 0.0f);
             Vector3 up      = new Vector3(0.0f, 1.0f, 0.0f);
