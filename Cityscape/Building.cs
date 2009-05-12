@@ -25,6 +25,7 @@ namespace Cityscape
         private Matrix model;
         private VertexDeclaration vertDecl;
         private Texture2D bldTex;
+        private IGraphicsDeviceService graphicsDeviceService;
 
         public Building(Game game)
             : base(game)
@@ -48,6 +49,7 @@ namespace Cityscape
         public override void Initialize()
         {
             // TODO: Add your initialization code here
+            graphicsDeviceService = (IGraphicsDeviceService)Game.Services.GetService(typeof(IGraphicsDeviceService));
             List<VertexPositionNormalTexture> listVert = new List<VertexPositionNormalTexture>();
             List<Int16> listIndex = new List<Int16>();
 
@@ -59,7 +61,7 @@ namespace Cityscape
 
             bldTex = Game.Content.Load<Texture2D>("bldtex");
             effect = Game.Content.Load<Effect>("BuildingEffect");
-            vertDecl = new VertexDeclaration(Game.GraphicsDevice, VertexPositionNormalTexture.VertexElements);
+            vertDecl = new VertexDeclaration(graphicsDeviceService.GraphicsDevice, VertexPositionNormalTexture.VertexElements);
             effect.CurrentTechnique = effect.Techniques["DefaultTechnique"];
             effect.Parameters["texBld"].SetValue(bldTex);
             effect.Parameters["Diffuse"].SetValue(new Vector4(0.7f, 0.7f, 0.7f, 0.0f));
@@ -88,14 +90,14 @@ namespace Cityscape
             effect.Parameters["View"].SetValue(((Game1)Game).view);
             effect.Parameters["Projection"].SetValue(((Game1)Game).projection);
             effect.Parameters["Light0Position"].SetValue(((Game1)Game).cameraPos);
-            Game.GraphicsDevice.VertexDeclaration = vertDecl;
+            graphicsDeviceService.GraphicsDevice.VertexDeclaration = vertDecl;
 
             effect.Begin();
             foreach (EffectPass pass in effect.CurrentTechnique.Passes)
             {
                 pass.Begin();
 
-                GraphicsDevice.DrawUserIndexedPrimitives<VertexPositionNormalTexture>(
+                graphicsDeviceService.GraphicsDevice.DrawUserIndexedPrimitives<VertexPositionNormalTexture>(
                   PrimitiveType.TriangleList,
                   vertices,
                   0,
