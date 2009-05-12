@@ -23,13 +23,17 @@ namespace Cityscape
         SpriteBatch spriteBatch;
         List<Building> buildings = new List<Building>();
 
+        public Matrix view;
+        public Matrix projection;
+        public Vector3 cameraPos;
+        Vector3 lookAt;
+        float angle;
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            Building bldg = new Building(this);
-            buildings.Add(bldg);
-            Components.Add(bldg);
+
         }
 
         /// <summary>
@@ -41,6 +45,14 @@ namespace Cityscape
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
+            Building bldg = new Building(this);
+            buildings.Add(bldg);
+            Components.Add(bldg);
+            projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(45),
+                (float)graphics.GraphicsDevice.Viewport.Width / (float)graphics.GraphicsDevice.Viewport.Height,
+                1.0f, 1000.0f);
+
+            angle = 0;
 
             base.Initialize();
         }
@@ -88,10 +100,30 @@ namespace Cityscape
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1.0f, 0);
 
+            graphics.GraphicsDevice.RenderState.CullMode = CullMode.None;
+            graphics.GraphicsDevice.RenderState.DepthBufferEnable = true;
+            graphics.GraphicsDevice.RenderState.AlphaBlendEnable = false;
+            graphics.GraphicsDevice.RenderState.AlphaTestEnable = false;
+            graphics.GraphicsDevice.SamplerStates[0].AddressU = TextureAddressMode.Wrap;
+            graphics.GraphicsDevice.SamplerStates[0].AddressV = TextureAddressMode.Wrap;
+            graphics.GraphicsDevice.SamplerStates[0].MagFilter = TextureFilter.GaussianQuad;
+            graphics.GraphicsDevice.SamplerStates[0].MinFilter = TextureFilter.GaussianQuad;
+            graphics.GraphicsDevice.SamplerStates[0].MipFilter = TextureFilter.GaussianQuad;
             // TODO: Add your drawing code here
 
+            angle += (float)gameTime.ElapsedRealTime.Milliseconds / 1000.0f;
+
+            cameraPos.X = (float)Math.Sin((double)angle) * 4.0f;
+            cameraPos.Z = (float)Math.Cos((double)angle) * 4.0f;
+            cameraPos.Y = 1.0f;
+
+            lookAt = new Vector3(0.0f, 0.0f, 0.0f);
+            Vector3 right = Vector3.Cross(Vector3.UnitY, lookAt - cameraPos);
+            Vector3 Up = -Vector3.Cross(right, lookAt - cameraPos);
+            Up.Normalize();
+            view = Matrix.CreateLookAt(cameraPos, lookAt, Up);
             base.Draw(gameTime);
         }
     }
