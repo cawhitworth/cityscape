@@ -10,7 +10,6 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using Microsoft.Xna.Framework.Net;
 using Microsoft.Xna.Framework.Storage;
-using System.Collections.Generic;
 
 namespace Cityscape
 {
@@ -19,13 +18,14 @@ namespace Cityscape
     /// </summary>
     public class Building : Microsoft.Xna.Framework.DrawableGameComponent
     {
-        private VertexPositionNormalTexture[] vertices;
-        private Int16[] indices;
-        private Effect effect;
-        private Matrix model;
-        private VertexDeclaration vertDecl;
-        private Texture2D bldTex;
-        private IGraphicsDeviceService graphicsDeviceService;
+        VertexPositionNormalTexture[] vertices;
+        Int16[] indices;
+        Effect effect;
+        Matrix model;
+        VertexDeclaration vertDecl;
+        Texture2D bldTex;
+        IGraphicsDeviceService graphicsDeviceService;
+        ICamera camera;
 
         public Building(Game game)
             : base(game)
@@ -50,6 +50,8 @@ namespace Cityscape
         {
             // TODO: Add your initialization code here
             graphicsDeviceService = (IGraphicsDeviceService)Game.Services.GetService(typeof(IGraphicsDeviceService));
+            camera = (ICamera) Game.Services.GetService(typeof(ICamera));
+
             List<VertexPositionNormalTexture> listVert = new List<VertexPositionNormalTexture>();
             List<Int16> listIndex = new List<Int16>();
 
@@ -87,9 +89,9 @@ namespace Cityscape
         public override void Draw(GameTime gameTime)
         {
             effect.Parameters["World"].SetValue(model);
-            effect.Parameters["View"].SetValue(((Game1)Game).view);
-            effect.Parameters["Projection"].SetValue(((Game1)Game).projection);
-            effect.Parameters["Light0Position"].SetValue(((Game1)Game).cameraPos);
+            effect.Parameters["View"].SetValue(camera.View);
+            effect.Parameters["Projection"].SetValue(camera.Projection);
+            effect.Parameters["Light0Position"].SetValue(camera.CameraPos);
             graphicsDeviceService.GraphicsDevice.VertexDeclaration = vertDecl;
 
             effect.Begin();

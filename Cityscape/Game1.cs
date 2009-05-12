@@ -10,7 +10,6 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using Microsoft.Xna.Framework.Net;
 using Microsoft.Xna.Framework.Storage;
-using System.Collections.Generic;
 
 namespace Cityscape
 {
@@ -20,20 +19,15 @@ namespace Cityscape
     public class Game1 : Microsoft.Xna.Framework.Game
     {
         GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
         List<Building> buildings = new List<Building>();
-
-        public Matrix view;
-        public Matrix projection;
-        public Vector3 cameraPos;
-        Vector3 lookAt;
-        float angle;
+        Camera camera;
+        KeyboardState ks;
+        UInt32 frame;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-
         }
 
         /// <summary>
@@ -48,12 +42,14 @@ namespace Cityscape
             Building bldg = new Building(this);
             buildings.Add(bldg);
             Components.Add(bldg);
-            projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(45),
-                (float)graphics.GraphicsDevice.Viewport.Width / (float)graphics.GraphicsDevice.Viewport.Height,
-                1.0f, 1000.0f);
 
-            angle = 0;
-
+            camera = new Camera(this);
+            Components.Add(camera);
+            Services.AddService(typeof(ICamera), camera);
+            ks = Keyboard.GetState();
+            frame = 0;
+            IsFixedTimeStep = false; // If this is true, then Update() and Draw() can block on things like window movements
+                                     // Besides, who uses fixed step updates anyway? What is this, 1993?
             base.Initialize();
         }
 
@@ -63,10 +59,6 @@ namespace Cityscape
         /// </summary>
         protected override void LoadContent()
         {
-            // Create a new SpriteBatch, which can be used to draw textures.
-            spriteBatch = new SpriteBatch(GraphicsDevice);
-
-            // TODO: use this.Content to load your game content here
         }
 
         /// <summary>
@@ -88,8 +80,12 @@ namespace Cityscape
             // Allows the game to exit
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
-
             // TODO: Add your update logic here
+            KeyboardState newState = Keyboard.GetState();
+            if (newState.IsKeyUp(Keys.Escape) && ks.IsKeyDown(Keys.Escape))
+                this.Exit();
+
+            ks = newState;
 
             base.Update(gameTime);
         }
@@ -111,19 +107,7 @@ namespace Cityscape
             graphics.GraphicsDevice.SamplerStates[0].MagFilter = TextureFilter.GaussianQuad;
             graphics.GraphicsDevice.SamplerStates[0].MinFilter = TextureFilter.GaussianQuad;
             graphics.GraphicsDevice.SamplerStates[0].MipFilter = TextureFilter.GaussianQuad;
-            // TODO: Add your drawing code here
 
-            angle += (float)gameTime.ElapsedRealTime.Milliseconds / 1000.0f;
-
-            cameraPos.X = (float)Math.Sin((double)angle) * 4.0f;
-            cameraPos.Z = (float)Math.Cos((double)angle) * 4.0f;
-            cameraPos.Y = 1.0f;
-
-            lookAt = new Vector3(0.0f, 0.0f, 0.0f);
-            Vector3 right = Vector3.Cross(Vector3.UnitY, lookAt - cameraPos);
-            Vector3 Up = -Vector3.Cross(right, lookAt - cameraPos);
-            Up.Normalize();
-            view = Matrix.CreateLookAt(cameraPos, lookAt, Up);
             base.Draw(gameTime);
         }
     }
