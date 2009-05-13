@@ -26,10 +26,12 @@ namespace Cityscape
         Texture2D bldTex;
         IGraphicsDeviceService graphicsDeviceService;
         ICamera camera;
+        Vector3 origin;
 
-        public Building(Game game)
+        public Building(Game game, Vector3 origin)
             : base(game)
         {
+            this.origin = origin;
         }
 
         public void updateGeometry( List<VertexPositionNormalTexture> listVertices, List<Int16> listIndices )
@@ -55,9 +57,9 @@ namespace Cityscape
             List<VertexPositionNormalTexture> listVert = new List<VertexPositionNormalTexture>();
             List<Int16> listIndex = new List<Int16>();
 
-            AddBox(ref listVert, ref listIndex, new Vector3(0.0f, -0.5f, 0.0f), new Vector3(1.0f, 0.1f, 1.0f));
+            AddBox(ref listVert, ref listIndex, origin + new Vector3(0.0f, -0.5f, 0.0f), new Vector3(1.0f, 0.1f, 1.0f));
 
-            AddBox(ref listVert, ref listIndex, new Vector3(0.0f, 0.0f, 0.0f), new Vector3(0.5f, 1.0f, 0.5f));
+            AddBox(ref listVert, ref listIndex, origin, new Vector3(0.5f, 1.0f, 0.5f));
 
             updateGeometry(listVert, listIndex);
 
