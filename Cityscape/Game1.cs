@@ -20,9 +20,12 @@ namespace Cityscape
     {
         GraphicsDeviceManager graphics;
         List<Building> buildings = new List<Building>();
-        Camera camera;
         KeyboardState ks;
         UInt32 frame;
+        IFrameCounter frameCounterService;
+        SpriteBatch spriteBatch;
+        SpriteFont font;
+        Vector2 textPos;
 
         public Game1()
         {
@@ -38,19 +41,31 @@ namespace Cityscape
         /// </summary>
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
-            Building bldg = new Building(this);
-            buildings.Add(bldg);
-            Components.Add(bldg);
+            FrameCounter fc = new FrameCounter(this);
+            Components.Add(fc);
+            Services.AddService(typeof(IFrameCounter), fc);
+            frameCounterService = (IFrameCounter) Services.GetService(typeof(IFrameCounter));
+            
+            for(int x=-2; x<3; x++)
+                for (int y = -2; y <3; y++)
+                {
+                    Building bldg = new Building(this, new Vector3(x, 0.0f, y));
+                    buildings.Add(bldg);
+                    Components.Add(bldg);
+                }
 
-            camera = new Camera(this);
+            Camera camera = new Camera(this);
             Components.Add(camera);
             Services.AddService(typeof(ICamera), camera);
             ks = Keyboard.GetState();
             frame = 0;
             IsFixedTimeStep = false; // If this is true, then Update() and Draw() can block on things like window movements
                                      // Besides, who uses fixed step updates anyway? What is this, 1993?
+            textPos = new Vector2(graphics.GraphicsDevice.Viewport.Width / 8,
+                                  graphics.GraphicsDevice.Viewport.Height / 8);
+            
             base.Initialize();
+
         }
 
         /// <summary>
@@ -59,8 +74,10 @@ namespace Cityscape
         /// </summary>
         protected override void LoadContent()
         {
+            spriteBatch = new SpriteBatch(GraphicsDevice);
+            font = Content.Load<SpriteFont>("DebugFont"); 
         }
-
+        
         /// <summary>
         /// UnloadContent will be called once per game and is the place to unload
         /// all content.
@@ -109,6 +126,11 @@ namespace Cityscape
             graphics.GraphicsDevice.SamplerStates[0].MipFilter = TextureFilter.GaussianQuad;
 
             base.Draw(gameTime);
+
+            spriteBatch.Begin();
+            string fps = "Framerate: Current " + (int)frameCounterService.CurrentFPS + "fps, overall " + (int)frameCounterService.OverallFPS;
+            spriteBatch.DrawString(font, fps, textPos, Color.Yellow);
+            spriteBatch.End();
         }
     }
 }

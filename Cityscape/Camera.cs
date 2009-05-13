@@ -61,10 +61,10 @@ namespace Cityscape
         public override void Update(GameTime gameTime)
         {
             // TODO: Add your update code here
-            angle += (float)gameTime.ElapsedRealTime.Milliseconds / 1000.0f;
-            cameraPos.X = (float)Math.Sin((double)angle) * 4.0f;
-            cameraPos.Z = (float)Math.Cos((double)angle) * 4.0f;
-            cameraPos.Y = 1.0f;
+            angle += (float)gameTime.ElapsedRealTime.Milliseconds / 4000.0f;
+            cameraPos.X = (float)Math.Sin((double)angle) * 10.0f;
+            cameraPos.Z = (float)Math.Cos((double)angle) * 10.0f;
+            cameraPos.Y = 0.0f;
 
             lookAt = new Vector3(0.0f, 0.0f, 0.0f);
             right = Vector3.Cross(Vector3.UnitY, lookAt - cameraPos);
