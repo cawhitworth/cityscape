@@ -23,7 +23,7 @@ namespace Cityscape
         Effect effect;
         Matrix model;
         VertexDeclaration vertDecl;
-        Texture2D bldTex;
+        static Texture2D bldTex;
         IGraphicsDeviceService graphicsDeviceService;
         ICamera camera;
         Vector3 origin;
@@ -63,13 +63,14 @@ namespace Cityscape
 
             updateGeometry(listVert, listIndex);
 
-            bldTex = Game.Content.Load<Texture2D>("bldtex");
+            if (bldTex == null)
+                bldTex = BuildingTextureGenerator.MakeTexture(graphicsDeviceService.GraphicsDevice);
             effect = Game.Content.Load<Effect>("BuildingEffect");
             vertDecl = new VertexDeclaration(graphicsDeviceService.GraphicsDevice, VertexPositionNormalTexture.VertexElements);
             effect.CurrentTechnique = effect.Techniques["DefaultTechnique"];
             effect.Parameters["texBld"].SetValue(bldTex);
             effect.Parameters["Diffuse"].SetValue(new Vector4(0.7f, 0.7f, 0.7f, 0.0f));
-            effect.Parameters["Ambient"].SetValue(new Vector4(0.0f, 0.0f, 0.0f, 0.0f));
+            effect.Parameters["Ambient"].SetValue(new Vector4(0.3f, 0.3f, 0.3f, 0.0f));
             effect.Parameters["Light0Position"].SetValue(new Vector3(0.0f, 1.0f, 0.0f));
 
             model = Matrix.CreateScale(2.0f);
