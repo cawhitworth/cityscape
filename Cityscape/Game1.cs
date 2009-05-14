@@ -46,8 +46,8 @@ namespace Cityscape
             Services.AddService(typeof(IFrameCounter), fc);
             frameCounterService = (IFrameCounter) Services.GetService(typeof(IFrameCounter));
             
-            for(int x=-2; x<3; x++)
-                for (int y = -2; y <3; y++)
+            for(int x=-10; x<11; x++)
+                for (int y = -10; y <11; y++)
                 {
                     Building bldg = new Building(this, new Vector3(x, 0.0f, y));
                     buildings.Add(bldg);
@@ -128,7 +128,7 @@ namespace Cityscape
             base.Draw(gameTime);
 
             spriteBatch.Begin();
-            string fps = "Framerate: Current " + (int)frameCounterService.CurrentFPS + "fps, overall " + (int)frameCounterService.OverallFPS;
+            string fps = "Framerate: Current " + (int)frameCounterService.CurrentFPS + "fps, overall " + (int)frameCounterService.OverallFPS + ", polys/frame " + frameCounterService.CurrentPolysPerFrame;
             spriteBatch.DrawString(font, fps, textPos, Color.Yellow);
             spriteBatch.End();
         }

@@ -27,6 +27,7 @@ namespace Cityscape
         IGraphicsDeviceService graphicsDeviceService;
         ICamera camera;
         Vector3 origin;
+        IFrameCounter frameCounter;
 
         public Building(Game game, Vector3 origin)
             : base(game)
@@ -53,6 +54,7 @@ namespace Cityscape
             // TODO: Add your initialization code here
             graphicsDeviceService = (IGraphicsDeviceService)Game.Services.GetService(typeof(IGraphicsDeviceService));
             camera = (ICamera) Game.Services.GetService(typeof(ICamera));
+            frameCounter = (IFrameCounter) Game.Services.GetService(typeof(IFrameCounter));
 
             List<VertexPositionNormalTexture> listVert = new List<VertexPositionNormalTexture>();
             List<Int16> listIndex = new List<Int16>();
@@ -110,6 +112,8 @@ namespace Cityscape
                   indices,
                   0,
                   indices.Count() / 3);
+
+                frameCounter.AddRenderedPolys((UInt32)indices.Count() / 3);
 
                 pass.End();
             }
