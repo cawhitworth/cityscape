@@ -18,6 +18,8 @@ namespace Cityscape
     {
         float OverallFPS { get; }
         float CurrentFPS { get; }
+        UInt32 CurrentPolysPerFrame { get; }
+        void AddRenderedPolys(UInt32 count);
     }
 
     /// <summary>
@@ -31,6 +33,8 @@ namespace Cityscape
         UInt32 timeSinceLastReset;
         float totalFPS;
         float currentFPS;
+        UInt32 polysRendered;
+        UInt32 polysPerFrame;
 
         public float OverallFPS
         {
@@ -40,6 +44,16 @@ namespace Cityscape
         public float CurrentFPS
         {
             get { return currentFPS; }
+        }
+
+        public UInt32 CurrentPolysPerFrame
+        {
+            get { return polysPerFrame;}
+        }
+
+        public void AddRenderedPolys(UInt32 count)
+        {
+            polysRendered += count;
         }
 
         public FrameCounter(Game game)
@@ -78,9 +92,11 @@ namespace Cityscape
 
             if (timeSinceLastReset > 1000)
             {
+                polysPerFrame = polysRendered / framesSinceLastReset;
                 currentFPS = (float)framesSinceLastReset / timeSinceLastResetInSeconds;
-                timeSinceLastReset -= 1000;
+                timeSinceLastReset = 0;
                 framesSinceLastReset = 0;
+                polysRendered = 0;
             }
             base.Update(gameTime);
         }
