@@ -85,6 +85,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Building.cs" />
+    <Compile Include="BuildingBatch.cs" />
     <Compile Include="BuildingTextureGenerator.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="FrameCounter.cs" />
