@@ -45,11 +45,13 @@ namespace Cityscape
             Components.Add(fc);
             Services.AddService(typeof(IFrameCounter), fc);
             frameCounterService = (IFrameCounter) Services.GetService(typeof(IFrameCounter));
-            
-            for(int x=-10; x<11; x++)
-                for (int y = -10; y <11; y++)
+
+            Random rand = new Random();
+            for(int x=-15; x<16; x++)
+                for (int y = -15; y <16; y++)
                 {
-                    Building bldg = new Building(this, new Vector3(x, 0.0f, y));
+                    float height = (float)(rand.NextDouble() + 0.5f);
+                    Building bldg = new Building(this, new Vector3(x, 0.0f, y), height);
                     buildings.Add(bldg);
                     Components.Add(bldg);
                 }
