@@ -55,8 +55,8 @@ namespace Cityscape
             s = Stopwatch.StartNew();
 
             Random rand = new Random();
-            for(int x=-20; x<21; x++)
-                for (int y = -20; y <21; y++)
+            for(int x=-50; x<51; x++)
+                for (int y = -50; y <51; y++)
                 {
                     float height = (float)(rand.NextDouble() + 0.5f);
                     Building bldg = new Building(new Vector3(x, 0.0f, y), height);
@@ -66,7 +66,7 @@ namespace Cityscape
             System.Console.WriteLine(s.ElapsedMilliseconds);
 
             s.Reset(); s.Start();
-            buildings.UpdateGeometry();
+            buildings.UpdateGeometry(5000);
             s.Stop();
 
             System.Console.WriteLine(s.ElapsedMilliseconds);
