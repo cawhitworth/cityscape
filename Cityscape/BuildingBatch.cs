@@ -25,8 +25,8 @@ namespace Cityscape
         VertexDeclaration vertDecl;
         static Texture2D bldTex;
 
-        VertexPositionNormalTexture[] vertices;
-        int[] indices;
+        List<VertexPositionNormalTexture[]> vertices = new List<VertexPositionNormalTexture[]>();
+        List<short[]> indices = new List<short[]>();
         List<Building> buildings = new List<Building>();
 
         // Services needed
@@ -72,29 +72,54 @@ namespace Cityscape
             buildings.Add(b);
         }
 
-        public void UpdateGeometry()
+        public void UpdateGeometry(int batchSize)
         {
-            int vertCount = 0;
-            int indexCount = 0;
+            bool newBatch = true;
+            List<VertexPositionNormalTexture> vertBatch = null;
+            VertexPositionNormalTexture[] vertArray = null;
+            List<int> indexBatch = null;
+            short[] indexArray = null;
 
-            foreach( Building b in buildings)
+            foreach(Building b in buildings)
             {
-                vertCount += b.Vertices.Count();
-                indexCount += b.Indices.Count();
-            }
+                if (newBatch)
+                {
+                    if (vertBatch != null)
+                    {
+                        int index = 0;
+                        vertArray = new VertexPositionNormalTexture[vertBatch.Count()];
+                        foreach(VertexPositionNormalTexture v in vertBatch)
+                            vertArray[index++] = v;
+                        vertices.Add(vertArray);
+                        index = 0;
+                        indexArray = new short[indexBatch.Count()];
+                        foreach(int i in indexBatch)
+                            indexArray[index++] = (short)i;
+                        indices.Add(indexArray);
+                    }
+                    vertBatch = new List<VertexPositionNormalTexture>();
+                    indexBatch = new List<int>();
+                }
 
-            vertices = new VertexPositionNormalTexture[vertCount];
-            indices = new int[indexCount];
-
-            int vertex = 0, index = 0, baseIndex ;
-
-            foreach (Building b in buildings)
-            {
-                baseIndex = vertex;
-                foreach(VertexPositionNormalTexture v in b.Vertices)
-                    vertices[vertex++] = v;
+                int baseIndex = vertBatch.Count();
+                vertBatch.AddRange(b.Vertices);
                 foreach (int i in b.Indices)
-                    indices[index++] = i + baseIndex;
+                    indexBatch.Add( i + baseIndex );
+
+                newBatch = vertBatch.Count() > batchSize;
+            }
+            if (vertBatch != null)
+            {
+                int index = 0;
+                vertArray = new VertexPositionNormalTexture[vertBatch.Count()];
+                foreach (VertexPositionNormalTexture v in vertBatch)
+                    vertArray[index++] = v;
+                vertices.Add(vertArray);
+                index = 0;
+                indexArray = new short[indexBatch.Count()];
+                foreach (int i in indexBatch)
+                    indexArray[index++] = (short)i;
+                indices.Add(indexArray);
             }
 
         }
@@ -126,16 +151,19 @@ namespace Cityscape
             {
                 pass.Begin();
 
-                graphicsDeviceService.GraphicsDevice.DrawUserIndexedPrimitives<VertexPositionNormalTexture>(
-                  PrimitiveType.TriangleList,
-                  vertices,
-                  0,
-                  vertices.Count(),
-                  indices,
-                  0,
-                  indices.Count() / 3);
-
-                frameCounter.AddRenderedPolys((UInt32)indices.Count() / 3);
+                int index = 0;
+                for (index = 0; index < vertices.Count(); index++)
+                {
+                    graphicsDeviceService.GraphicsDevice.DrawUserIndexedPrimitives<VertexPositionNormalTexture>(
+                      PrimitiveType.TriangleList,
+                      vertices[index],
+                      0,
+                      vertices[index].Count(),
+                      indices[index],
+                      0,
+                      indices[index].Count() / 3);
+                    frameCounter.AddRenderedPolys((UInt32)indices[index].Count() / 3);
+                }
 
                 pass.End();
             }
