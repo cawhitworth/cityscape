@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Diagnostics;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
@@ -19,13 +21,13 @@ namespace Cityscape
     public class Game1 : Microsoft.Xna.Framework.Game
     {
         GraphicsDeviceManager graphics;
-        List<Building> buildings = new List<Building>();
         KeyboardState ks;
         UInt32 frame;
         IFrameCounter frameCounterService;
         SpriteBatch spriteBatch;
         SpriteFont font;
         Vector2 textPos;
+        BuildingBatch buildings;
 
         public Game1()
         {
@@ -45,14 +47,29 @@ namespace Cityscape
             Components.Add(fc);
             Services.AddService(typeof(IFrameCounter), fc);
             frameCounterService = (IFrameCounter) Services.GetService(typeof(IFrameCounter));
-            
-            for(int x=-10; x<11; x++)
-                for (int y = -10; y <11; y++)
+
+            buildings = new BuildingBatch(this);
+            Components.Add(buildings);
+
+            Stopwatch s;
+            s = Stopwatch.StartNew();
+
+            Random rand = new Random();
+            for(int x=-20; x<21; x++)
+                for (int y = -20; y <21; y++)
                 {
-                    Building bldg = new Building(this, new Vector3(x, 0.0f, y));
-                    buildings.Add(bldg);
-                    Components.Add(bldg);
+                    float height = (float)(rand.NextDouble() + 0.5f);
+                    Building bldg = new Building(new Vector3(x, 0.0f, y), height);
+                    buildings.AddBuilding(bldg);
                 }
+            s.Stop();
+            System.Console.WriteLine(s.ElapsedMilliseconds);
+
+            s.Reset(); s.Start();
+            buildings.UpdateGeometry();
+            s.Stop();
+
+            System.Console.WriteLine(s.ElapsedMilliseconds);
 
             Camera camera = new Camera(this);
             Components.Add(camera);

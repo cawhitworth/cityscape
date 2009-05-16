@@ -16,115 +16,39 @@ namespace Cityscape
     /// <summary>
     /// This is a game component that implements IUpdateable.
     /// </summary>
-    public class Building : Microsoft.Xna.Framework.DrawableGameComponent
+    public class Building
     {
-        VertexPositionNormalTexture[] vertices;
-        Int16[] indices;
-        Effect effect;
-        Matrix model;
-        VertexDeclaration vertDecl;
-        static Texture2D bldTex;
-        IGraphicsDeviceService graphicsDeviceService;
-        ICamera camera;
+        List<VertexPositionNormalTexture> vertices = new List<VertexPositionNormalTexture>();
+        List<int> indices = new List<int>();
         Vector3 origin;
-        IFrameCounter frameCounter;
+        float height;
 
-        public Building(Game game, Vector3 origin)
-            : base(game)
+        public IList<VertexPositionNormalTexture> Vertices
+        {
+            get { return vertices.AsReadOnly(); }
+        }
+
+        public IList<int> Indices
+        {
+            get { return indices.AsReadOnly(); }
+        }
+
+        public Building(Vector3 origin, float height)
         {
             this.origin = origin;
+            this.height = height;
+
+            AddBox(ref vertices, ref indices, origin, new Vector3(1.0f, 0.1f, 1.0f));
+
+//            AddBox(ref vertices, ref indices, origin + new Vector3(0.0f, height / 2.0f, 0.0f), new Vector3(0.5f, height, 0.5f));
+            
+            AddBox(ref vertices, ref indices, origin + new Vector3(0.0f, height / 4.0f, 0.0f), new Vector3(0.75f, height / 2.0f, 0.75f));
+            AddBox(ref vertices, ref indices, origin + new Vector3(0.0f, 3.0f * (height / 4.0f), 0.0f), new Vector3(0.5f, height / 2.0f, 0.5f));
+
+            AddBox(ref vertices, ref indices, origin + new Vector3(0.0f, height * 1.1f, 0.0f), new Vector3(0.1f, height * 0.2f, 0.1f));
         }
 
-        public void updateGeometry( List<VertexPositionNormalTexture> listVertices, List<Int16> listIndices )
-        {
-            vertices = new VertexPositionNormalTexture[listVertices.Count()];
-            indices = new Int16[listIndices.Count()];
-            for (int index = 0; index < listVertices.Count(); index++)
-                vertices[index] = listVertices[index];
-            for (int index = 0; index < listIndices.Count(); index++)
-                indices[index] = listIndices[index];
-        }
-
-        /// <summary>
-        /// Allows the game component to perform any initialization it needs to before starting
-        /// to run.  This is where it can query for any required services and load content.
-        /// </summary>
-        public override void Initialize()
-        {
-            // TODO: Add your initialization code here
-            graphicsDeviceService = (IGraphicsDeviceService)Game.Services.GetService(typeof(IGraphicsDeviceService));
-            camera = (ICamera) Game.Services.GetService(typeof(ICamera));
-            frameCounter = (IFrameCounter) Game.Services.GetService(typeof(IFrameCounter));
-
-            List<VertexPositionNormalTexture> listVert = new List<VertexPositionNormalTexture>();
-            List<Int16> listIndex = new List<Int16>();
-
-            AddBox(ref listVert, ref listIndex, origin + new Vector3(0.0f, -0.5f, 0.0f), new Vector3(1.0f, 0.1f, 1.0f));
-
-            AddBox(ref listVert, ref listIndex, origin, new Vector3(0.5f, 1.0f, 0.5f));
-
-            updateGeometry(listVert, listIndex);
-
-            if (bldTex == null)
-                bldTex = BuildingTextureGenerator.MakeTexture(graphicsDeviceService.GraphicsDevice);
-            effect = Game.Content.Load<Effect>("BuildingEffect");
-            vertDecl = new VertexDeclaration(graphicsDeviceService.GraphicsDevice, VertexPositionNormalTexture.VertexElements);
-            effect.CurrentTechnique = effect.Techniques["DefaultTechnique"];
-            effect.Parameters["texBld"].SetValue(bldTex);
-            effect.Parameters["Diffuse"].SetValue(new Vector4(0.7f, 0.7f, 0.7f, 0.0f));
-            effect.Parameters["Ambient"].SetValue(new Vector4(0.3f, 0.3f, 0.3f, 0.0f));
-            effect.Parameters["Light0Position"].SetValue(new Vector3(0.0f, 1.0f, 0.0f));
-
-            model = Matrix.CreateScale(2.0f);
-
-            base.Initialize();
-        }
-
-        /// <summary>
-        /// Allows the game component to update itself.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
-        public override void Update(GameTime gameTime)
-        {
-            // TODO: Add your update code here
-
-            base.Update(gameTime);
-        }
-
-        public override void Draw(GameTime gameTime)
-        {
-            effect.Parameters["World"].SetValue(model);
-            effect.Parameters["View"].SetValue(camera.View);
-            effect.Parameters["Projection"].SetValue(camera.Projection);
-            effect.Parameters["Light0Position"].SetValue(camera.CameraPos);
-            graphicsDeviceService.GraphicsDevice.VertexDeclaration = vertDecl;
-
-            effect.Begin();
-            foreach (EffectPass pass in effect.CurrentTechnique.Passes)
-            {
-                pass.Begin();
-
-                graphicsDeviceService.GraphicsDevice.DrawUserIndexedPrimitives<VertexPositionNormalTexture>(
-                  PrimitiveType.TriangleList,
-                  vertices,
-                  0,
-                  vertices.Count(),
-                  indices,
-                  0,
-                  indices.Count() / 3);
-
-                frameCounter.AddRenderedPolys((UInt32)indices.Count() / 3);
-
-                pass.End();
-            }
-            effect.End();
-
-
-
-            base.Draw(gameTime);
-        }
-
-        private void AddBox(ref List<VertexPositionNormalTexture> verts, ref List<Int16> indices, Vector3 origin, Vector3 dimensions)
+        private static void AddBox(ref List<VertexPositionNormalTexture> verts, ref List<int> indices, Vector3 origin, Vector3 dimensions)
         {
             // Corners
             Vector3 backBottomLeft   = new Vector3( origin.X - dimensions.X / 2.0f, origin.Y - dimensions.Y / 2.0f, origin.Z - dimensions.Z / 2.0f);
@@ -150,8 +74,13 @@ namespace Cityscape
             Vector2 texTopLeft = new Vector2(0.0f, 1.0f);
             Vector2 texTopRight = new Vector2(1.0f, 1.0f);
 
+            Vector2 texBottomLeftBlack = new Vector2(0.0f, 0.0f);
+            Vector2 texBottomRightBlack = new Vector2(0.0f, 0.0f);
+            Vector2 texTopLeftBlack = new Vector2(0.0f, 0.0f);
+            Vector2 texTopRightBlack = new Vector2(0.0f, 0.0f);
+
             // Front face
-            Int16 index = (Int16)verts.Count();
+            int index =  verts.Count();
             Vector2 faceTexScale = new Vector2(dimensions.X, dimensions.Y);
 
             verts.Add(new VertexPositionNormalTexture( frontBottomLeft, forward, texBottomLeft * faceTexScale));
@@ -159,34 +88,24 @@ namespace Cityscape
             verts.Add(new VertexPositionNormalTexture( frontBottomRight, forward, texBottomRight * faceTexScale));
             verts.Add(new VertexPositionNormalTexture( frontTopRight, forward, texTopRight * faceTexScale));
 
-            indices.Add( index );
-            indices.Add( (Int16)(index + 1) );
-            indices.Add( (Int16)(index + 2) );
-
-            indices.Add( (Int16)(index + 1) );
-            indices.Add( (Int16)(index + 3) );
-            indices.Add( (Int16)(index + 2) );
+            indices.Add( index ); indices.Add( index + 1 ); indices.Add( index + 2 );
+            indices.Add( index + 1 ); indices.Add( index + 3 ); indices.Add( index + 2 );
 
             // Left face
-            index = (Int16)verts.Count();
-            faceTexScale.X = -dimensions.Z; faceTexScale.Y = dimensions.Y;
+            index = verts.Count();
+            faceTexScale.X = dimensions.Z; faceTexScale.Y = dimensions.Y;
 
             verts.Add(new VertexPositionNormalTexture( backBottomLeft, left, texBottomLeft * faceTexScale));
             verts.Add(new VertexPositionNormalTexture( backTopLeft, left, texTopLeft * faceTexScale));
             verts.Add(new VertexPositionNormalTexture( frontBottomLeft, left, texBottomRight * faceTexScale));
             verts.Add(new VertexPositionNormalTexture( frontTopLeft, left, texTopRight * faceTexScale));
 
-            indices.Add( index );
-            indices.Add( (Int16)(index + 1) );
-            indices.Add( (Int16)(index + 2) );
-
-            indices.Add( (Int16)(index + 1) );
-            indices.Add( (Int16)(index + 3) );
-            indices.Add( (Int16)(index + 2) );
+            indices.Add( index ); indices.Add( index + 1 ); indices.Add( index + 2 );
+            indices.Add( index + 1 ); indices.Add( index + 3 ); indices.Add( index + 2 );
 
             // Right face
 
-            index = (Int16)verts.Count();
+            index = verts.Count();
             faceTexScale.X = dimensions.Z; faceTexScale.Y = dimensions.Y;
 
             verts.Add(new VertexPositionNormalTexture( frontBottomRight, right, texBottomLeft * faceTexScale));
@@ -194,67 +113,46 @@ namespace Cityscape
             verts.Add(new VertexPositionNormalTexture( backBottomRight, right, texBottomRight * faceTexScale));
             verts.Add(new VertexPositionNormalTexture( backTopRight, right, texTopRight * faceTexScale));
 
-            indices.Add( index );
-            indices.Add( (Int16)(index + 1) );
-            indices.Add( (Int16)(index + 2) );
-
-            indices.Add( (Int16)(index + 1) );
-            indices.Add( (Int16)(index + 3) );
-            indices.Add( (Int16)(index + 2) );
+            indices.Add( index ); indices.Add( index + 1 ); indices.Add( index + 2 );
+            indices.Add( index + 1 ); indices.Add( index + 3 ); indices.Add( index + 2 );
 
             // Back face
-            index = (Int16)verts.Count();
-            faceTexScale.X = -dimensions.X; faceTexScale.Y = dimensions.Y;
+            index = verts.Count();
+            faceTexScale.X = dimensions.X; faceTexScale.Y = dimensions.Y;
 
             verts.Add(new VertexPositionNormalTexture( backBottomRight, back, texBottomLeft * faceTexScale));
             verts.Add(new VertexPositionNormalTexture( backTopRight, back, texTopLeft * faceTexScale));
             verts.Add(new VertexPositionNormalTexture( backBottomLeft, back, texBottomRight * faceTexScale));
             verts.Add(new VertexPositionNormalTexture( backTopLeft, back, texTopRight * faceTexScale));
 
-            indices.Add( index );
-            indices.Add( (Int16)(index + 1) );
-            indices.Add( (Int16)(index + 2) );
-
-            indices.Add( (Int16)(index + 1) );
-            indices.Add( (Int16)(index + 3) );
-            indices.Add( (Int16)(index + 2) );
+            indices.Add( index ); indices.Add( index + 1 ); indices.Add( index + 2 );
+            indices.Add( index + 1 ); indices.Add( index + 3 ); indices.Add( index + 2 );
 
             // Top face
 
-            index = (Int16)verts.Count();
+            index = verts.Count();
             faceTexScale.X = dimensions.X; faceTexScale.Y = dimensions.Z;
 
-            verts.Add(new VertexPositionNormalTexture( frontTopLeft, up, texBottomLeft * faceTexScale));
-            verts.Add(new VertexPositionNormalTexture( backTopLeft, up, texTopLeft * faceTexScale));
-            verts.Add(new VertexPositionNormalTexture( frontTopRight, up, texBottomRight * faceTexScale));
-            verts.Add(new VertexPositionNormalTexture( backTopRight, up, texTopRight * faceTexScale));
+            verts.Add(new VertexPositionNormalTexture( frontTopLeft, up, texBottomLeftBlack * faceTexScale));
+            verts.Add(new VertexPositionNormalTexture( backTopLeft, up, texTopLeftBlack * faceTexScale));
+            verts.Add(new VertexPositionNormalTexture( frontTopRight, up, texBottomRightBlack * faceTexScale));
+            verts.Add(new VertexPositionNormalTexture( backTopRight, up, texTopRightBlack * faceTexScale));
 
-            indices.Add( index );
-            indices.Add( (Int16)(index + 1) );
-            indices.Add( (Int16)(index + 2) );
-
-            indices.Add( (Int16)(index + 1) );
-            indices.Add( (Int16)(index + 3) );
-            indices.Add( (Int16)(index + 2) );
+            indices.Add( index ); indices.Add( index + 1 ); indices.Add( index + 2 );
+            indices.Add( index + 1 ); indices.Add( index + 3 ); indices.Add( index + 2 );
 
             // Bottom face
 
-            index = (Int16)verts.Count();
-            faceTexScale.X = -dimensions.X; faceTexScale.Y = -dimensions.Z;
+            index = verts.Count();
+            faceTexScale.X = dimensions.X; faceTexScale.Y = dimensions.Z;
 
-            verts.Add(new VertexPositionNormalTexture( backBottomLeft, down, texBottomLeft * faceTexScale));
-            verts.Add(new VertexPositionNormalTexture( frontBottomLeft, down, texTopLeft * faceTexScale));
-            verts.Add(new VertexPositionNormalTexture( backBottomRight, down, texBottomRight * faceTexScale));
-            verts.Add(new VertexPositionNormalTexture( frontBottomRight, down, texTopRight * faceTexScale));
+            verts.Add(new VertexPositionNormalTexture( backBottomLeft, down, texBottomLeftBlack * faceTexScale));
+            verts.Add(new VertexPositionNormalTexture( frontBottomLeft, down, texTopLeftBlack * faceTexScale));
+            verts.Add(new VertexPositionNormalTexture( backBottomRight, down, texBottomRightBlack * faceTexScale));
+            verts.Add(new VertexPositionNormalTexture( frontBottomRight, down, texTopRightBlack * faceTexScale));
 
-            indices.Add( index );
-            indices.Add( (Int16)(index + 1) );
-            indices.Add( (Int16)(index + 2) );
-
-            indices.Add( (Int16)(index + 1) );
-            indices.Add( (Int16)(index + 3) );
-            indices.Add( (Int16)(index + 2) );
-
+            indices.Add( index ); indices.Add( index + 1 ); indices.Add( index + 2 );
+            indices.Add( index + 1 ); indices.Add( index + 3 ); indices.Add( index + 2 );
         }
     }
 }
