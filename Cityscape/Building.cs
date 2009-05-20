@@ -37,9 +37,9 @@ namespace Cityscape
             get { return indices.AsReadOnly(); }
         }
 
-        public Building(Vector3 origin, int stories, Vector2 baseDimensions)
+        public Building(Vector3 center, int stories, Vector2 baseDimensions)
         {
-            this.origin = origin;
+            this.origin = center - new Vector3(baseDimensions.X * storyDimensions.X, 0.0f, baseDimensions.Y * storyDimensions.Z);;
 
             this.height = (float)stories * storyDimensions.Y; ;
 
@@ -53,12 +53,12 @@ namespace Cityscape
             int size = (int)(baseDimensions.X / 3) + rand.Next( (int) (baseDimensions.X / 4) );
             int range = (int) baseDimensions.X - size;
 
-            float xOffset = (float)rand.Next(range) - ((float)range / 2.0f);
-            float yOffset = (float)rand.Next(range) - ((float)range / 2.0f);
+            float xOffset = (float)rand.Next((int)baseDimensions.X - size) * storyDimensions.X;
+            float yOffset = (float)rand.Next((int)baseDimensions.Y - size) * storyDimensions.Z;
 
             // Main
             AddBox(ref vertices, ref indices,
-                origin + new Vector3(storyDimensions.X * (float)xOffset, height / 2.0f, storyDimensions.Z * (float)yOffset),
+                origin + new Vector3(xOffset, 0.0f, yOffset), 
                 storyDimensions,
                 new Vector3((float)size, (float) stories, (float) size)
                 );
@@ -77,13 +77,14 @@ namespace Cityscape
 
 
         private static void AddBox(ref List<VertexPositionNormalTexture> verts, ref List<int> indices,
-                                   Vector3 origin, 
+                                   Vector3 position, 
                                    Vector3 storyDimensions,
                                    Vector3 stories)
         {
-            // Corners
             Vector3 dimensions = new Vector3(stories.X * storyDimensions.X, stories.Y * storyDimensions.Y, stories.Z * storyDimensions.Z);
+            Vector3 origin = position + (dimensions / 2.0f);
 
+            // Corners - the maths is getting increasingly redundant here...
             Vector3 backBottomLeft   = new Vector3( origin.X - dimensions.X / 2.0f, origin.Y - dimensions.Y / 2.0f, origin.Z - dimensions.Z / 2.0f);
             Vector3 backBottomRight  = new Vector3( origin.X + dimensions.X / 2.0f, origin.Y - dimensions.Y / 2.0f, origin.Z - dimensions.Z / 2.0f);
             Vector3 backTopLeft      = new Vector3( origin.X - dimensions.X / 2.0f, origin.Y + dimensions.Y / 2.0f, origin.Z - dimensions.Z / 2.0f);
