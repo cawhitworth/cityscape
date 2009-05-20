@@ -23,6 +23,10 @@ namespace Cityscape
         Vector3 origin;
         float height;
 
+        static Random rand = new Random();
+
+        static readonly Vector3 storyDimensions = new Vector3(0.1f, 0.1f, 0.1f);
+
         public IList<VertexPositionNormalTexture> Vertices
         {
             get { return vertices.AsReadOnly(); }
@@ -33,24 +37,53 @@ namespace Cityscape
             get { return indices.AsReadOnly(); }
         }
 
-        public Building(Vector3 origin, float height)
+        public Building(Vector3 origin, int stories, Vector2 baseDimensions)
         {
             this.origin = origin;
-            this.height = height;
 
-            AddBox(ref vertices, ref indices, origin, new Vector3(1.0f, 0.1f, 1.0f));
+            this.height = (float)stories * storyDimensions.Y; ;
 
-//            AddBox(ref vertices, ref indices, origin + new Vector3(0.0f, height / 2.0f, 0.0f), new Vector3(0.5f, height, 0.5f));
+            // Base
+            AddBox(ref vertices, ref indices,
+                origin,
+                storyDimensions,
+                new Vector3(baseDimensions.X, 0.1f, baseDimensions.Y)
+                );
+
+            int size = (int)(baseDimensions.X / 3) + rand.Next( (int) (baseDimensions.X / 4) );
+            int range = (int) baseDimensions.X - size;
+
+            float xOffset = (float)rand.Next(range) - ((float)range / 2.0f);
+            float yOffset = (float)rand.Next(range) - ((float)range / 2.0f);
+
+            // Main
+            AddBox(ref vertices, ref indices,
+                origin + new Vector3(storyDimensions.X * (float)xOffset, height / 2.0f, storyDimensions.Z * (float)yOffset),
+                storyDimensions,
+                new Vector3((float)size, (float) stories, (float) size)
+                );
+
+//            AddBox(ref vertices, ref indices,
+//                origin + new Vector3(0.0f, height / 2.0f, 0.0f),
+//                storyDimensions,
+//                new Vector3(8.0f, (float)stories, 8.0f)
+//                );
             
-            AddBox(ref vertices, ref indices, origin + new Vector3(0.0f, height / 4.0f, 0.0f), new Vector3(0.75f, height / 2.0f, 0.75f));
-            AddBox(ref vertices, ref indices, origin + new Vector3(0.0f, 3.0f * (height / 4.0f), 0.0f), new Vector3(0.5f, height / 2.0f, 0.5f));
+//            AddBox(ref vertices, ref indices, origin + new Vector3(0.0f, height / 4.0f, 0.0f), new Vector3(0.75f, height / 2.0f, 0.75f));
+//            AddBox(ref vertices, ref indices, origin + new Vector3(0.0f, 3.0f * (height / 4.0f), 0.0f), new Vector3(0.5f, height / 2.0f, 0.5f));
 
-            AddBox(ref vertices, ref indices, origin + new Vector3(0.0f, height * 1.1f, 0.0f), new Vector3(0.1f, height * 0.2f, 0.1f));
+//            AddBox(ref vertices, ref indices, origin + new Vector3(0.0f, height * 1.1f, 0.0f), new Vector3(0.1f, height * 0.2f, 0.1f));
         }
 
-        private static void AddBox(ref List<VertexPositionNormalTexture> verts, ref List<int> indices, Vector3 origin, Vector3 dimensions)
+
+        private static void AddBox(ref List<VertexPositionNormalTexture> verts, ref List<int> indices,
+                                   Vector3 origin, 
+                                   Vector3 storyDimensions,
+                                   Vector3 stories)
         {
             // Corners
+            Vector3 dimensions = new Vector3(stories.X * storyDimensions.X, stories.Y * storyDimensions.Y, stories.Z * storyDimensions.Z);
+
             Vector3 backBottomLeft   = new Vector3( origin.X - dimensions.X / 2.0f, origin.Y - dimensions.Y / 2.0f, origin.Z - dimensions.Z / 2.0f);
             Vector3 backBottomRight  = new Vector3( origin.X + dimensions.X / 2.0f, origin.Y - dimensions.Y / 2.0f, origin.Z - dimensions.Z / 2.0f);
             Vector3 backTopLeft      = new Vector3( origin.X - dimensions.X / 2.0f, origin.Y + dimensions.Y / 2.0f, origin.Z - dimensions.Z / 2.0f);
@@ -69,19 +102,28 @@ namespace Cityscape
             Vector3 up      = new Vector3(0.0f, 1.0f, 0.0f);
             Vector3 down    = new Vector3(0.0f, -1.0f, 0.0f);
 
-            Vector2 texBottomLeft = new Vector2(0.0f, 0.0f);
-            Vector2 texBottomRight = new Vector2(1.0f, 0.0f);
-            Vector2 texTopLeft = new Vector2(0.0f, 1.0f);
-            Vector2 texTopRight = new Vector2(1.0f, 1.0f);
+            float texWidth = stories.X * BuildingTextureGenerator.StoryXMultiplier;
+            float texDepth = stories.Z * BuildingTextureGenerator.StoryXMultiplier;
+            float texHeight = stories.Y * BuildingTextureGenerator.StoryYMultiplier;
+
+            Vector2 texOrigin = new Vector2(rand.Next(64) * BuildingTextureGenerator.StoryXMultiplier, 
+                                            rand.Next(64) * BuildingTextureGenerator.StoryYMultiplier);
+
+            Vector2 texBottomLeft = texOrigin + new Vector2(0.0f, 0.0f);
+            Vector2 texBottomRight = texOrigin + new Vector2(texWidth, 0.0f);
+            Vector2 texTopLeft = texOrigin + new Vector2(0.0f, texHeight);
+            Vector2 texTopRight = texOrigin + new Vector2(texWidth, texHeight);
 
             Vector2 texBottomLeftBlack = new Vector2(0.0f, 0.0f);
             Vector2 texBottomRightBlack = new Vector2(0.0f, 0.0f);
             Vector2 texTopLeftBlack = new Vector2(0.0f, 0.0f);
             Vector2 texTopRightBlack = new Vector2(0.0f, 0.0f);
 
+            Vector2 faceTexScale = new Vector2(1.0f, 1.0f);
+
             // Front face
             int index =  verts.Count();
-            Vector2 faceTexScale = new Vector2(dimensions.X, dimensions.Y);
+//            Vector2 faceTexScale = new Vector2(dimensions.X, dimensions.Y);
 
             verts.Add(new VertexPositionNormalTexture( frontBottomLeft, forward, texBottomLeft * faceTexScale));
             verts.Add(new VertexPositionNormalTexture( frontTopLeft, forward, texTopLeft * faceTexScale));
@@ -91,22 +133,14 @@ namespace Cityscape
             indices.Add( index ); indices.Add( index + 1 ); indices.Add( index + 2 );
             indices.Add( index + 1 ); indices.Add( index + 3 ); indices.Add( index + 2 );
 
-            // Left face
-            index = verts.Count();
-            faceTexScale.X = dimensions.Z; faceTexScale.Y = dimensions.Y;
-
-            verts.Add(new VertexPositionNormalTexture( backBottomLeft, left, texBottomLeft * faceTexScale));
-            verts.Add(new VertexPositionNormalTexture( backTopLeft, left, texTopLeft * faceTexScale));
-            verts.Add(new VertexPositionNormalTexture( frontBottomLeft, left, texBottomRight * faceTexScale));
-            verts.Add(new VertexPositionNormalTexture( frontTopLeft, left, texTopRight * faceTexScale));
-
-            indices.Add( index ); indices.Add( index + 1 ); indices.Add( index + 2 );
-            indices.Add( index + 1 ); indices.Add( index + 3 ); indices.Add( index + 2 );
-
+            
             // Right face
 
+            texBottomLeft.X += texWidth; texTopLeft.X += texWidth;
+            texBottomRight.X += texDepth; texTopRight.X += texDepth;
+
             index = verts.Count();
-            faceTexScale.X = dimensions.Z; faceTexScale.Y = dimensions.Y;
+//            faceTexScale.X = dimensions.Z; faceTexScale.Y = dimensions.Y;
 
             verts.Add(new VertexPositionNormalTexture( frontBottomRight, right, texBottomLeft * faceTexScale));
             verts.Add(new VertexPositionNormalTexture( frontTopRight, right, texTopLeft * faceTexScale));
@@ -117,8 +151,10 @@ namespace Cityscape
             indices.Add( index + 1 ); indices.Add( index + 3 ); indices.Add( index + 2 );
 
             // Back face
+            texBottomLeft.X += texDepth; texTopLeft.X += texDepth;
+            texBottomRight.X += texWidth; texTopRight.X += texWidth;
             index = verts.Count();
-            faceTexScale.X = dimensions.X; faceTexScale.Y = dimensions.Y;
+//            faceTexScale.X = dimensions.X; faceTexScale.Y = dimensions.Y;
 
             verts.Add(new VertexPositionNormalTexture( backBottomRight, back, texBottomLeft * faceTexScale));
             verts.Add(new VertexPositionNormalTexture( backTopRight, back, texTopLeft * faceTexScale));
@@ -128,10 +164,25 @@ namespace Cityscape
             indices.Add( index ); indices.Add( index + 1 ); indices.Add( index + 2 );
             indices.Add( index + 1 ); indices.Add( index + 3 ); indices.Add( index + 2 );
 
+            // Left face
+            texBottomLeft.X += texWidth; texTopLeft.X += texWidth;
+            texBottomRight.X += texDepth; texTopRight.X += texDepth;
+
+            index = verts.Count();
+//            faceTexScale.X = dimensions.Z; faceTexScale.Y = dimensions.Y;
+
+            verts.Add(new VertexPositionNormalTexture( backBottomLeft, left, texBottomLeft * faceTexScale));
+            verts.Add(new VertexPositionNormalTexture( backTopLeft, left, texTopLeft * faceTexScale));
+            verts.Add(new VertexPositionNormalTexture( frontBottomLeft, left, texBottomRight * faceTexScale));
+            verts.Add(new VertexPositionNormalTexture( frontTopLeft, left, texTopRight * faceTexScale));
+
+            indices.Add( index ); indices.Add( index + 1 ); indices.Add( index + 2 );
+            indices.Add( index + 1 ); indices.Add( index + 3 ); indices.Add( index + 2 );
+
             // Top face
 
             index = verts.Count();
-            faceTexScale.X = dimensions.X; faceTexScale.Y = dimensions.Z;
+//            faceTexScale.X = dimensions.X; faceTexScale.Y = dimensions.Z;
 
             verts.Add(new VertexPositionNormalTexture( frontTopLeft, up, texBottomLeftBlack * faceTexScale));
             verts.Add(new VertexPositionNormalTexture( backTopLeft, up, texTopLeftBlack * faceTexScale));
@@ -144,7 +195,7 @@ namespace Cityscape
             // Bottom face
 
             index = verts.Count();
-            faceTexScale.X = dimensions.X; faceTexScale.Y = dimensions.Z;
+//            faceTexScale.X = dimensions.X; faceTexScale.Y = dimensions.Z;
 
             verts.Add(new VertexPositionNormalTexture( backBottomLeft, down, texBottomLeftBlack * faceTexScale));
             verts.Add(new VertexPositionNormalTexture( frontBottomLeft, down, texTopLeftBlack * faceTexScale));

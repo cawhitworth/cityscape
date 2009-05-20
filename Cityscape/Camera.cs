@@ -62,9 +62,9 @@ namespace Cityscape
         {
             // TODO: Add your update code here
             angle += (float)gameTime.ElapsedRealTime.Milliseconds / 4000.0f;
-            cameraPos.X = (float)Math.Sin((double)angle) * 50.0f;
-            cameraPos.Z = (float)Math.Cos((double)angle) * 50.0f;
-            cameraPos.Y = 20.0f;
+            cameraPos.X = (float)Math.Sin((double)angle) * 10.0f;
+            cameraPos.Z = (float)Math.Cos((double)angle) * 10.00f;
+            cameraPos.Y = 2.0f;
 
             lookAt = new Vector3(0.0f, 0.0f, 0.0f);
             right = Vector3.Cross(Vector3.UnitY, lookAt - cameraPos);
