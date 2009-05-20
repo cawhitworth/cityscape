@@ -8,24 +8,36 @@ namespace Cityscape
 {
     class BuildingTextureGenerator 
     {
+        public const int textureWidth = 512;
+        public const int textureHeight = 512;
+        public const int windowHeight = 8;
+        public const int windowWidth = 8;
+
+        static Random rand = new Random();
+
+        public static float StoryXMultiplier
+        {
+            get { return 1.0f / (float)(textureWidth / windowWidth); }
+        }
+
+        public static float StoryYMultiplier
+        {
+            get { return 1.0f / (float)(textureHeight / windowHeight); }
+        }
+
         public static Texture2D MakeTexture(GraphicsDevice device)
         {
-            int height = 512;
-            int width = 512;
-            int windowHeight = 8;
-            int windowWidth = 8;
 
-            Texture2D texture = new Texture2D(device, width, height, 0, TextureUsage.AutoGenerateMipMap, SurfaceFormat.Color);
-            Color[] textureData = new Color[width*height];
+            Texture2D texture = new Texture2D(device, textureWidth, textureHeight, 0, TextureUsage.AutoGenerateMipMap, SurfaceFormat.Color);
+            Color[] textureData = new Color[textureWidth*textureHeight];
             texture.GetData<Color>(textureData);
-            for (int index = 0; index < width * height; index++) textureData[index].PackedValue = 0xff202020;
+            for (int index = 0; index < textureWidth * textureHeight; index++) textureData[index].PackedValue = 0xff202020;
 
             // 8x8 windows?
 
-            Random rand = new Random();
-            for (int x = 0; x < width / windowWidth; x++)
+            for (int x = 0; x < textureWidth / windowWidth; x++)
             {
-                for (int y = 0; y < height / windowHeight; y++)
+                for (int y = 0; y < textureHeight / windowHeight; y++)
                 {
                     bool light = rand.NextDouble() > 0.8;
                     float shade = (float) rand.NextDouble() * 0.2f;
@@ -37,7 +49,7 @@ namespace Cityscape
                     {
                         for (int yy = 1; yy < windowHeight - 1; yy++)
                         {
-                            textureData[ (x*windowWidth) + xx + ((y * windowHeight) + yy) * width] = col;
+                            textureData[ (x*windowWidth) + xx + ((y * windowHeight) + yy) * textureWidth] = col;
                         }
                     }
 
