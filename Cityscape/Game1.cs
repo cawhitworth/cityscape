@@ -29,6 +29,8 @@ namespace Cityscape
         Vector2 textPos;
         BuildingBatch buildings;
 
+        static Random rand = new Random();
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -54,12 +56,11 @@ namespace Cityscape
             Stopwatch s;
             s = Stopwatch.StartNew();
 
-            Random rand = new Random();
-            for(int x=-50; x<51; x++)
-                for (int y = -50; y <51; y++)
+            for(int x=-2; x<3; x++)
+                for (int y=-2; y <3; y++)
                 {
-                    float height = (float)(rand.NextDouble() + 0.5f);
-                    Building bldg = new Building(new Vector3(x, 0.0f, y), height);
+                    int stories = 15 + rand.Next(15);
+                    Building bldg = new Building(new Vector3(x*2, 0.0f, y*2), stories, new Vector2(18.0f, 18.0f));
                     buildings.AddBuilding(bldg);
                 }
             s.Stop();
