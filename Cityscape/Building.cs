@@ -37,6 +37,30 @@ namespace Cityscape
             get { return indices.AsReadOnly(); }
         }
 
+        private void GetCentreSpanningRect(int baseWidth, int baseHeight, bool isBase,
+            out int xSize, out int ySize, out int xPos, out int yPos)
+        {
+            int centreX = baseWidth / 2;
+            int centreY = baseHeight / 2;
+            do {
+                if (isBase)
+                {
+                    xSize = (baseWidth / 2) + rand.Next(baseWidth / 4);
+                    ySize = xSize;
+                }
+                else
+                {
+                    xSize = (baseWidth / 2) + rand.Next(baseWidth / 4);
+                    ySize = (baseWidth / 2) + rand.Next(baseHeight / 4);
+                }
+                xPos = rand.Next(baseWidth - xSize);
+                yPos = rand.Next(baseHeight - ySize);
+
+            } while ( ! ( (xPos <= centreX) && (xPos + xSize > centreX) && 
+                          (yPos <= centreY) && (yPos + ySize > centreY)));
+
+        }
+
         public Building(Vector3 center, int stories, Vector2 baseDimensions)
         {
             this.origin = center - new Vector3(baseDimensions.X * storyDimensions.X, 0.0f, baseDimensions.Y * storyDimensions.Z);;
@@ -50,29 +74,35 @@ namespace Cityscape
                 new Vector3(baseDimensions.X, 0.1f, baseDimensions.Y)
                 );
 
-            int size = (int)(baseDimensions.X / 3) + rand.Next( (int) (baseDimensions.X / 4) );
-            int range = (int) baseDimensions.X - size;
-
-            float xOffset = (float)rand.Next((int)baseDimensions.X - size) * storyDimensions.X;
-            float yOffset = (float)rand.Next((int)baseDimensions.Y - size) * storyDimensions.Z;
-
+            int xSize, ySize, xPos, yPos;
+            GetCentreSpanningRect((int)baseDimensions.X, (int)baseDimensions.Y, true,
+                            out xSize, out ySize, out xPos, out yPos);
+            float xOffset = (float) xPos * storyDimensions.X;
+            float yOffset = (float) yPos * storyDimensions.Z;
+            
             // Main
             AddBox(ref vertices, ref indices,
                 origin + new Vector3(xOffset, 0.0f, yOffset), 
                 storyDimensions,
-                new Vector3((float)size, (float) stories, (float) size)
+                new Vector3((float)xSize, (float) stories, (float) ySize)
                 );
 
-//            AddBox(ref vertices, ref indices,
-//                origin + new Vector3(0.0f, height / 2.0f, 0.0f),
-//                storyDimensions,
-//                new Vector3(8.0f, (float)stories, 8.0f)
-//                );
-            
-//            AddBox(ref vertices, ref indices, origin + new Vector3(0.0f, height / 4.0f, 0.0f), new Vector3(0.75f, height / 2.0f, 0.75f));
-//            AddBox(ref vertices, ref indices, origin + new Vector3(0.0f, 3.0f * (height / 4.0f), 0.0f), new Vector3(0.5f, height / 2.0f, 0.5f));
+            int subBoxes = rand.Next(4);
+            for(int subBox = 0; subBox < subBoxes; subBox++)
+            {
+                stories = (stories * 3) / 4;
 
-//            AddBox(ref vertices, ref indices, origin + new Vector3(0.0f, height * 1.1f, 0.0f), new Vector3(0.1f, height * 0.2f, 0.1f));
+                GetCentreSpanningRect((int)baseDimensions.X, (int)baseDimensions.Y, false,
+                              out xSize, out ySize, out xPos, out yPos);
+                xOffset = (float)xPos * storyDimensions.X;
+                yOffset = (float)yPos * storyDimensions.Z;
+
+                AddBox(ref vertices, ref indices,
+                  origin + new Vector3(xOffset, 0.0f, yOffset),
+                  storyDimensions,
+                  new Vector3((float)xSize, (float)stories, (float)ySize)
+                  );
+            }
         }
 
 
