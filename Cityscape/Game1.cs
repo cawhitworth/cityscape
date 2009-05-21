@@ -59,7 +59,7 @@ namespace Cityscape
             for(int x=-2; x<3; x++)
                 for (int y=-2; y <3; y++)
                 {
-                    int stories = 15 + rand.Next(15);
+                    int stories = 30 + rand.Next(30);
                     Building bldg = new Building(new Vector3(x*2, 0.0f, y*2), stories, new Vector2(18.0f, 18.0f));
                     buildings.AddBuilding(bldg);
                 }
