@@ -55,14 +55,20 @@ namespace Cityscape
 
             Stopwatch s;
             s = Stopwatch.StartNew();
+            Building bldg;
 
-            for(int x=-2; x<3; x++)
-                for (int y=-2; y <3; y++)
+            for(int x=-10; x<11; x++)
+                for (int y=-10; y <11; y++)
                 {
                     int stories = 30 + rand.Next(30);
-                    Building bldg = new Building(new Vector3(x*2, 0.0f, y*2), stories, new Vector2(18.0f, 18.0f));
+                    bldg = new Building(new Vector3(x*4, 0.0f, y*4), stories, new Vector2(20.0f, 20.0f));
                     buildings.AddBuilding(bldg);
                 }
+
+
+            bldg = new Building(new Vector3(0.0f, 0.0f, 0.0f), 1, new Vector2(2000.0f, 2000.0f));
+            buildings.AddBuilding(bldg);
+
             s.Stop();
             System.Console.WriteLine(s.ElapsedMilliseconds);
 

@@ -66,9 +66,9 @@ namespace Cityscape
         {
             /*
             angle += (float)gameTime.ElapsedRealTime.Milliseconds / 4000.0f;
-            cameraPos.X = (float)Math.Sin((double)angle) * 10.0f;
-            cameraPos.Z = (float)Math.Cos((double)angle) * 10.00f;
-            cameraPos.Y = 17.0f;
+            cameraPos.X = (float)Math.Sin((double)angle) * 50.0f;
+            cameraPos.Z = (float)Math.Cos((double)angle) * 50.0f;
+            cameraPos.Y = 15.0f;
 
             lookAt = new Vector3(0.0f, 0.0f, 0.0f);*/
             

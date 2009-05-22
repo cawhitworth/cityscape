@@ -63,7 +63,7 @@ namespace Cityscape
 
         public Building(Vector3 center, int stories, Vector2 baseDimensions)
         {
-            this.origin = center - new Vector3(baseDimensions.X * storyDimensions.X, 0.0f, baseDimensions.Y * storyDimensions.Z);;
+            this.origin = center - new Vector3(baseDimensions.X * (storyDimensions.X / 2.0f), 0.0f, baseDimensions.Y * (storyDimensions.Z / 2.0f));;
 
             this.height = (float)stories * storyDimensions.Y; ;
 
@@ -74,9 +74,16 @@ namespace Cityscape
                 new Vector3(baseDimensions.X, 0.1f, baseDimensions.Y)
                 );
 
-            int xSize, ySize, xPos, yPos;
-            GetCentreSpanningRect((int)baseDimensions.X, (int)baseDimensions.Y, true,
-                            out xSize, out ySize, out xPos, out yPos);
+            int baseWidth = (int)baseDimensions.X, baseHeight = (int) baseDimensions.Y;
+
+            int xSize = (baseWidth / 2) + rand.Next(baseWidth / 4);
+            int ySize = (baseHeight / 2) + rand.Next(baseHeight / 4);
+
+            int xPos = rand.Next(baseWidth - (xSize + 2)) + 1;
+            int yPos = rand.Next(baseHeight - (ySize + 2)) + 1;
+
+            System.Console.WriteLine("{0} {1} {2} {3}", xPos, yPos, xSize, ySize);
+
             float xOffset = (float) xPos * storyDimensions.X;
             float yOffset = (float) yPos * storyDimensions.Z;
             
@@ -87,22 +94,74 @@ namespace Cityscape
                 new Vector3((float)xSize, (float) stories, (float) ySize)
                 );
 
-            int subBoxes = rand.Next(4);
-            for(int subBox = 0; subBox < subBoxes; subBox++)
-            {
-                stories = (stories * 3) / 4;
+            // Left lump
 
-                GetCentreSpanningRect((int)baseDimensions.X, (int)baseDimensions.Y, false,
-                              out xSize, out ySize, out xPos, out yPos);
-                xOffset = (float)xPos * storyDimensions.X;
-                yOffset = (float)yPos * storyDimensions.Z;
+            int xPos2 = rand.Next(xPos-1);
+            int yPos2 = yPos + 1 + rand.Next(ySize / 2);
+            int xSize2 = xPos - xPos2;
+            int maxYSize = (ySize - 2) - (yPos2 - yPos) + 1;
+            int ySize2 = maxYSize / 2 + rand.Next( maxYSize / 2 );
+            System.Console.WriteLine("{0} {1} {2} {3} m{4}", xPos2, yPos2, xSize2, ySize2, maxYSize);
 
-                AddBox(ref vertices, ref indices,
-                  origin + new Vector3(xOffset, 0.0f, yOffset),
-                  storyDimensions,
-                  new Vector3((float)xSize, (float)stories, (float)ySize)
-                  );
-            }
+            xOffset = (float) xPos2 * storyDimensions.X;
+            yOffset = (float) yPos2 * storyDimensions.Z;
+            AddBox(ref vertices, ref indices,
+                origin + new Vector3(xOffset, 0.0f, yOffset), 
+                storyDimensions,
+                new Vector3((float)xSize2, (float) ((stories / 4) * rand.Next(4)), (float) ySize2)
+                );
+
+            // Front lump
+
+            xPos2 = xPos + 1 + rand.Next(xSize / 2);
+            yPos2 = rand.Next(yPos - 1);
+            ySize2 = yPos - yPos2;
+            int maxXSize = (xSize - 2) - (xPos2 - xPos) + 1;
+            xSize2 = maxXSize / 2 + rand.Next( maxXSize / 2 );
+            System.Console.WriteLine("{0} {1} {2} {3} m{4}", xPos2, yPos2, xSize2, ySize2, maxYSize);
+
+            xOffset = (float) xPos2 * storyDimensions.X;
+            yOffset = (float) yPos2 * storyDimensions.Z;
+            AddBox(ref vertices, ref indices,
+                origin + new Vector3(xOffset, 0.0f, yOffset), 
+                storyDimensions,
+                new Vector3((float)xSize2, (float) ((stories / 4) * rand.Next(4)), (float) ySize2)
+                );
+
+            // Right lump
+
+            xPos2 = xPos + xSize - 1;
+            yPos2 = yPos + 1 + rand.Next(ySize / 2);
+            xSize2 = rand.Next(baseWidth - (xPos2 + 1)) + 2;
+            maxYSize = (ySize - 2) - (yPos2 - yPos) + 1;
+            ySize2 = maxYSize / 2 + rand.Next( maxYSize / 2 );
+            System.Console.WriteLine("{0} {1} {2} {3} m{4}", xPos2, yPos2, xSize2, ySize2, maxYSize);
+
+            xOffset = (float) xPos2 * storyDimensions.X;
+            yOffset = (float) yPos2 * storyDimensions.Z;
+            AddBox(ref vertices, ref indices,
+                origin + new Vector3(xOffset, 0.0f, yOffset), 
+                storyDimensions,
+                new Vector3((float)xSize2, (float) ((stories / 4) * rand.Next(4)), (float) ySize2)
+                );
+
+            // Back lump
+
+            yPos2 = yPos + ySize - 1;
+            xPos2 = xPos + 1 + rand.Next(xSize / 2);
+            ySize2 = rand.Next(baseWidth - (yPos2 + 1)) + 2;
+            maxXSize = (xSize - 2) - (xPos2 - xPos) + 1;
+            xSize2 = maxXSize / 2 + rand.Next( maxXSize / 2 );
+            System.Console.WriteLine("{0} {1} {2} {3} m{4}", xPos2, yPos2, xSize2, ySize2, maxYSize);
+
+            xOffset = (float) xPos2 * storyDimensions.X;
+            yOffset = (float) yPos2 * storyDimensions.Z;
+            AddBox(ref vertices, ref indices,
+                origin + new Vector3(xOffset, 0.0f, yOffset), 
+                storyDimensions,
+                new Vector3((float)xSize2, (float) ((stories / 4) * rand.Next(4)), (float) ySize2)
+                );
+
         }
 
 
