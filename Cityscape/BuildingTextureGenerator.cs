@@ -25,13 +25,22 @@ namespace Cityscape
             get { return 1.0f / (float)(textureHeight / windowHeight); }
         }
 
+        static byte ModColor(byte component, int divisor)
+        {
+            int comp = (int)component;
+            comp -= rand.Next( component / divisor );
+            if (comp > 255) comp = 255;
+            if (comp < 0) comp = 0;
+            return (byte)comp;
+        }
+
         public static Texture2D MakeTexture(GraphicsDevice device)
         {
 
             Texture2D texture = new Texture2D(device, textureWidth, textureHeight, 0, TextureUsage.AutoGenerateMipMap, SurfaceFormat.Color);
             Color[] textureData = new Color[textureWidth*textureHeight];
             texture.GetData<Color>(textureData);
-            for (int index = 0; index < textureWidth * textureHeight; index++) textureData[index].PackedValue = 0xff202020;
+            for (int index = 0; index < textureWidth * textureHeight; index++) textureData[index].PackedValue = 0xff000000;
 
             // 8x8 windows?
 
@@ -53,6 +62,20 @@ namespace Cityscape
                         }
                     }
 
+                    // Add noise
+
+                    int points = rand.Next(16) + 16;
+                    for(int point = 0; point < points; point ++)
+                    {
+                        int xx = rand.Next(6) + 1;
+                        int yy = rand.Next(4) + 1;
+                        Color c = textureData[ (x * windowWidth) + xx + ((y * windowHeight) + yy) * textureWidth];
+                        c.R = ModColor(c.R, 2); c.G = c.B = c.R;
+                        c.G = ModColor(c.G, 4);
+                        c.B = ModColor(c.B, 4);
+                        textureData[ (x * windowWidth) + xx + ((y * windowHeight) + yy) * textureWidth] = c;
+
+                    }
                 }
             }
 

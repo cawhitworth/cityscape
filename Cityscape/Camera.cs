@@ -32,6 +32,9 @@ namespace Cityscape
         float angle;
         Vector3 cameraPos, right, up, lookAt;
 
+        Vector3 position = new Vector3(0.0f, 0.0f, 0.0f);
+        float hAngle = 0.0f, vAngle = 0.0f;
+
         public Camera(Game game)
             : base(game)
         {
@@ -48,9 +51,10 @@ namespace Cityscape
             IGraphicsDeviceService graphicsDeviceService = (IGraphicsDeviceService)Game.Services.GetService(typeof(IGraphicsDeviceService));
             projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(45),
                 (float)graphicsDeviceService.GraphicsDevice.Viewport.Width / (float)graphicsDeviceService.GraphicsDevice.Viewport.Height,
-                1.0f, 1000.0f);
+                0.01f, 1000.0f);
 
             angle = 0.0f;
+
             base.Initialize();
         }
 
@@ -60,14 +64,46 @@ namespace Cityscape
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         public override void Update(GameTime gameTime)
         {
-            // TODO: Add your update code here
+            /*
             angle += (float)gameTime.ElapsedRealTime.Milliseconds / 4000.0f;
             cameraPos.X = (float)Math.Sin((double)angle) * 50.0f;
             cameraPos.Z = (float)Math.Cos((double)angle) * 50.0f;
             cameraPos.Y = 15.0f;
 
-            lookAt = new Vector3(0.0f, 0.0f, 0.0f);
+            lookAt = new Vector3(0.0f, 0.0f, 0.0f);*/
+            
+            KeyboardState ks = Keyboard.GetState();
+
+            if (ks.IsKeyDown(Keys.Left))
+                hAngle += (float)gameTime.ElapsedRealTime.Milliseconds / 1000.0f;
+            if (ks.IsKeyDown(Keys.Right))
+                hAngle -= (float)gameTime.ElapsedRealTime.Milliseconds / 1000.0f;
+
+            if (ks.IsKeyDown(Keys.Up))
+                vAngle += (float)gameTime.ElapsedRealTime.Milliseconds / 1000.0f;
+            if (ks.IsKeyDown(Keys.Down))
+                vAngle -= (float)gameTime.ElapsedRealTime.Milliseconds / 1000.0f;
+
+
+            cameraPos = position;
+            Vector3 lookDir = new Vector3(0.0f, 0.0f, -1.0f);
+
+            lookDir = Vector3.Transform(lookDir, Matrix.CreateRotationX(vAngle));
+            lookDir = Vector3.Transform(lookDir, Matrix.CreateRotationY(hAngle));
             right = Vector3.Cross(Vector3.UnitY, lookAt - cameraPos);
+            lookAt = position + lookDir;
+
+            if (ks.IsKeyDown(Keys.A))
+                position += right * ((float)gameTime.ElapsedRealTime.Milliseconds / 1000.0f);
+            if (ks.IsKeyDown(Keys.D))
+                position -= right * ((float)gameTime.ElapsedRealTime.Milliseconds / 1000.0f);
+
+            if (ks.IsKeyDown(Keys.W))
+                position += lookDir* ((float)gameTime.ElapsedRealTime.Milliseconds / 1000.0f);
+            if (ks.IsKeyDown(Keys.S))
+                position -= lookDir* ((float)gameTime.ElapsedRealTime.Milliseconds / 1000.0f);
+
+
             up = -Vector3.Cross(right, lookAt - cameraPos);
             up.Normalize();
             view = Matrix.CreateLookAt(cameraPos, lookAt, up);
