@@ -25,7 +25,7 @@ namespace Cityscape
         VertexDeclaration vertDecl;
         static Texture2D bldTex;
 
-        List<VertexPositionNormalTexture[]> vertices = new List<VertexPositionNormalTexture[]>();
+        List<VertexPositionNormalTextureMod[]> vertices = new List<VertexPositionNormalTextureMod[]>();
         List<short[]> indices = new List<short[]>();
         List<Building> buildings = new List<Building>();
 
@@ -55,7 +55,7 @@ namespace Cityscape
             if (bldTex == null)
                 bldTex = BuildingTextureGenerator.MakeTexture(graphicsDeviceService.GraphicsDevice);
             effect = Game.Content.Load<Effect>("BuildingEffect");
-            vertDecl = new VertexDeclaration(graphicsDeviceService.GraphicsDevice, VertexPositionNormalTexture.VertexElements);
+            vertDecl = new VertexDeclaration(graphicsDeviceService.GraphicsDevice, VertexPositionNormalTextureMod.VertexElements);
             effect.CurrentTechnique = effect.Techniques["DefaultTechnique"];
             effect.Parameters["texBld"].SetValue(bldTex);
             effect.Parameters["Diffuse"].SetValue(new Vector4(0.7f, 0.7f, 0.7f, 0.0f));
@@ -75,8 +75,8 @@ namespace Cityscape
         public void UpdateGeometry(int batchSize)
         {
             bool newBatch = true;
-            List<VertexPositionNormalTexture> vertBatch = null;
-            VertexPositionNormalTexture[] vertArray = null;
+            List<VertexPositionNormalTextureMod> vertBatch = null;
+            VertexPositionNormalTextureMod[] vertArray = null;
             List<int> indexBatch = null;
             short[] indexArray = null;
 
@@ -87,8 +87,8 @@ namespace Cityscape
                     if (vertBatch != null)
                     {
                         int index = 0;
-                        vertArray = new VertexPositionNormalTexture[vertBatch.Count()];
-                        foreach(VertexPositionNormalTexture v in vertBatch)
+                        vertArray = new VertexPositionNormalTextureMod[vertBatch.Count()];
+                        foreach(VertexPositionNormalTextureMod v in vertBatch)
                             vertArray[index++] = v;
                         vertices.Add(vertArray);
                         index = 0;
@@ -97,7 +97,7 @@ namespace Cityscape
                             indexArray[index++] = (short)i;
                         indices.Add(indexArray);
                     }
-                    vertBatch = new List<VertexPositionNormalTexture>();
+                    vertBatch = new List<VertexPositionNormalTextureMod>();
                     indexBatch = new List<int>();
                 }
 
@@ -111,8 +111,8 @@ namespace Cityscape
             if (vertBatch != null)
             {
                 int index = 0;
-                vertArray = new VertexPositionNormalTexture[vertBatch.Count()];
-                foreach (VertexPositionNormalTexture v in vertBatch)
+                vertArray = new VertexPositionNormalTextureMod[vertBatch.Count()];
+                foreach (VertexPositionNormalTextureMod v in vertBatch)
                     vertArray[index++] = v;
                 vertices.Add(vertArray);
                 index = 0;
@@ -154,7 +154,7 @@ namespace Cityscape
                 int index = 0;
                 for (index = 0; index < vertices.Count(); index++)
                 {
-                    graphicsDeviceService.GraphicsDevice.DrawUserIndexedPrimitives<VertexPositionNormalTexture>(
+                    graphicsDeviceService.GraphicsDevice.DrawUserIndexedPrimitives<VertexPositionNormalTextureMod>(
                       PrimitiveType.TriangleList,
                       vertices[index],
                       0,

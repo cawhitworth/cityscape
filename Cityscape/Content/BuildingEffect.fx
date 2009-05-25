@@ -22,6 +22,7 @@ struct VertexShaderInput
     float4 Position : POSITION0;
     float3 Normal : NORMAL;
     float2 Tex0 : TEXCOORD0;
+    float3 Mod : TEXCOORD1;
 };
 
 struct VertexShaderOutput
@@ -29,6 +30,7 @@ struct VertexShaderOutput
     float4 Position : POSITION0;
     float2 Tex0 : TEXCOORD0;
     float4 Diffuse : COLOR0;
+    float3 Mod : TEXCOORD1;
 };
 
 VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
@@ -39,7 +41,8 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
     float4 viewPosition = mul(worldPosition, View);
     output.Position = mul(viewPosition, Projection);
     output.Tex0 = input.Tex0;
-
+    output.Mod = input.Mod;
+    
     float4 worldNormal = mul(float4(input.Normal,0.0f), World);
     worldNormal = normalize(worldNormal);
     float4 lightDir = float4((Light0Position- worldPosition ),0.0f);
@@ -53,9 +56,8 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 
 float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 {
-    float4 col = tex2D(smpBld, input.Tex0);
+    float4 col = tex2D(smpBld, input.Tex0) * float4(input.Mod, 0.0f);
     return input.Diffuse * col;
-    return float4(1, 0, 0, 1);
 }
 
 technique DefaultTechnique
