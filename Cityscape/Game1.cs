@@ -28,7 +28,7 @@ namespace Cityscape
         SpriteFont font;
         Vector2 textPos;
         BuildingBatch buildings;
-
+        Color backgroundCol = new Color(0.0f, 0.0f, 0.1f);
         static Random rand = new Random();
 
         public Game1()
@@ -61,7 +61,7 @@ namespace Cityscape
                 for (int y=-10; y <11; y++)
                 {
                     int stories = 30 + rand.Next(30);
-                    bldg = new Building(new Vector3(x*4, 0.0f, y*4), stories, new Vector2(20.0f, 20.0f));
+                    bldg = new Building(new Vector3(x*2, 0.0f, y*2), stories, new Vector2(18.0f, 18.0f));
                     buildings.AddBuilding(bldg);
                 }
 
@@ -137,7 +137,7 @@ namespace Cityscape
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1.0f, 0);
+            GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, backgroundCol, 1.0f, 0);
 
             graphics.GraphicsDevice.RenderState.CullMode = CullMode.None;
             graphics.GraphicsDevice.RenderState.DepthBufferEnable = true;
