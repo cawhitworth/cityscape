@@ -27,7 +27,7 @@ namespace Cityscape
 
         List<VertexPositionNormalTextureMod[]> vertices = new List<VertexPositionNormalTextureMod[]>();
         List<short[]> indices = new List<short[]>();
-        List<Building> buildings = new List<Building>();
+        List<IBuilding> buildings = new List<IBuilding>();
 
         // Services needed
         IGraphicsDeviceService graphicsDeviceService;
@@ -56,18 +56,16 @@ namespace Cityscape
                 bldTex = BuildingTextureGenerator.MakeTexture(graphicsDeviceService.GraphicsDevice);
             effect = Game.Content.Load<Effect>("BuildingEffect");
             vertDecl = new VertexDeclaration(graphicsDeviceService.GraphicsDevice, VertexPositionNormalTextureMod.VertexElements);
-            effect.CurrentTechnique = effect.Techniques["DefaultTechnique"];
             effect.Parameters["texBld"].SetValue(bldTex);
-            effect.Parameters["Diffuse"].SetValue(new Vector4(0.7f, 0.7f, 0.7f, 0.0f));
-            effect.Parameters["Ambient"].SetValue(new Vector4(0.3f, 0.3f, 0.3f, 0.0f));
-            effect.Parameters["Light0Position"].SetValue(new Vector3(0.0f, 1.0f, 0.0f));
-
+            effect.Parameters["Diffuse"].SetValue(new Vector4(0.9f, 0.9f, 0.9f, 0.0f));
+            effect.Parameters["Ambient"].SetValue(new Vector4(0.1f, 0.1f, 0.1f, 0.0f));
+            effect.Parameters["LightDistance"].SetValue(0.1f);
             model = Matrix.Identity;
 
             base.Initialize();
         }
 
-        public void AddBuilding(Building b)
+        public void AddBuilding(IBuilding b)
         {
             buildings.Add(b);
         }
@@ -80,7 +78,7 @@ namespace Cityscape
             List<int> indexBatch = null;
             short[] indexArray = null;
 
-            foreach(Building b in buildings)
+            foreach(IBuilding b in buildings)
             {
                 if (newBatch)
                 {
@@ -145,7 +143,9 @@ namespace Cityscape
             effect.Parameters["View"].SetValue(camera.View);
             effect.Parameters["Projection"].SetValue(camera.Projection);
             effect.Parameters["Light0Position"].SetValue(camera.CameraPos);
+
             graphicsDeviceService.GraphicsDevice.VertexDeclaration = vertDecl;
+
             effect.Begin();
             foreach (EffectPass pass in effect.CurrentTechnique.Passes)
             {
