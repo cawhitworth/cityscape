@@ -55,19 +55,38 @@ namespace Cityscape
 
             Stopwatch s;
             s = Stopwatch.StartNew();
-            Building bldg;
-
-            for(int x=-10; x<11; x++)
-                for (int y=-10; y <11; y++)
+            IBuilding bldg;
+            int stories;
+            for(int x=-20; x<21; x++)
+                for (int y=-20; y <21; y++)
                 {
-                    int stories = 30 + rand.Next(30);
-                    bldg = new Building(new Vector3(x*2, 0.0f, y*2), stories, new Vector2(18.0f, 18.0f));
+                    switch (rand.Next(5))
+                    {
+                        case 0:
+                            stories = 30 + rand.Next(30);
+                            bldg = new UglyModernBuilding(new Vector3(x*2, 0.0f, y*2), stories, new Vector2(20.0f, 20.0f));
+                            break;
+                        case 1:
+                            stories = 10 + rand.Next(15);
+                            bldg = new UglyModernBuilding(new Vector3(x*2, 0.0f, y*2), stories, new Vector2(20.0f, 20.0f));
+                            break;
+                        case 2:
+                        case 3:
+                        case 4:
+                            stories = 5 + rand.Next(10);
+                            bldg = new SimpleBuilding(new Vector3(x*2, 0.0f, y*2), stories, new Vector2(20.0f, 20.0f));
+                            break;
+                        default:
+                            bldg = null;
+                            break;
+                    }
+
                     buildings.AddBuilding(bldg);
                 }
 
 
-            bldg = new Building(new Vector3(0.0f, 0.0f, 0.0f), 1, new Vector2(2000.0f, 2000.0f));
-            buildings.AddBuilding(bldg);
+//            bldg = new SimpleBuilding(new Vector3(0.0f, 0.0f, 0.0f), 1, new Vector2(2000.0f, 2000.0f));
+//            buildings.AddBuilding(bldg);
 
             s.Stop();
             System.Console.WriteLine(s.ElapsedMilliseconds);
@@ -87,7 +106,11 @@ namespace Cityscape
                                      // Besides, who uses fixed step updates anyway? What is this, 1993?
             textPos = new Vector2(graphics.GraphicsDevice.Viewport.Width / 8,
                                   graphics.GraphicsDevice.Viewport.Height / 8);
-            
+
+            graphics.PreferredBackBufferHeight = graphics.GraphicsDevice.DisplayMode.Height;
+            graphics.PreferredBackBufferWidth = graphics.GraphicsDevice.DisplayMode.Width;
+
+            graphics.ToggleFullScreen();
             base.Initialize();
 
         }
