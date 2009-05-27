@@ -24,6 +24,7 @@ namespace Cityscape
         Matrix model;
         VertexDeclaration vertDecl;
         static Texture2D bldTex;
+        int count = 0;
 
         List<VertexPositionNormalTextureMod[]> vertices = new List<VertexPositionNormalTextureMod[]>();
         List<short[]> indices = new List<short[]>();
@@ -56,10 +57,7 @@ namespace Cityscape
                 bldTex = BuildingTextureGenerator.MakeTexture(graphicsDeviceService.GraphicsDevice);
             effect = Game.Content.Load<Effect>("BuildingEffect");
             vertDecl = new VertexDeclaration(graphicsDeviceService.GraphicsDevice, VertexPositionNormalTextureMod.VertexElements);
-            effect.Parameters["texBld"].SetValue(bldTex);
-            effect.Parameters["Diffuse"].SetValue(new Vector4(0.9f, 0.9f, 0.9f, 0.0f));
-            effect.Parameters["Ambient"].SetValue(new Vector4(0.1f, 0.1f, 0.1f, 0.0f));
-            effect.Parameters["LightDistance"].SetValue(0.1f);
+
             model = Matrix.Identity;
 
             base.Initialize();
@@ -129,7 +127,6 @@ namespace Cityscape
         public override void Update(GameTime gameTime)
         {
             // TODO: Add your update code here
-
             base.Update(gameTime);
         }
 
@@ -143,6 +140,10 @@ namespace Cityscape
             effect.Parameters["View"].SetValue(camera.View);
             effect.Parameters["Projection"].SetValue(camera.Projection);
             effect.Parameters["Light0Position"].SetValue(camera.CameraPos);
+            effect.Parameters["texBld"].SetValue(bldTex);
+            effect.Parameters["Diffuse"].SetValue(new Vector4(0.9f, 0.9f, 0.9f, 0.0f));
+            effect.Parameters["Ambient"].SetValue(new Vector4(0.1f, 0.1f, 0.1f, 0.0f));
+            effect.Parameters["LightDistance"].SetValue(0.1f);
 
             graphicsDeviceService.GraphicsDevice.VertexDeclaration = vertDecl;
 

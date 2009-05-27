@@ -78,13 +78,14 @@ namespace Cityscape
             Vector2 texTopRightBlack = new Vector2(0.0f, 0.0f);
 
             Vector2 faceTexScale = new Vector2(1.0f, 1.0f);
+
             switch (stretch)
             {
                 case Stretch.Horizontal:
-                    faceTexScale.X = 2.0f;
+                    faceTexScale.Y = 0.5f;
                     break;
                 case Stretch.Vertical:
-                    faceTexScale.Y = 2.0f;
+                    faceTexScale.X = 0.5f;
                     break;
             }
 
@@ -179,25 +180,15 @@ namespace Cityscape
     {
         protected List<VertexPositionNormalTextureMod> vertices = new List<VertexPositionNormalTextureMod>();
         protected List<int> indices = new List<int>();
+        protected Vector3 origin;
+        protected Vector3 colorMod;
+        protected BuildingBuilder.Stretch stretch = BuildingBuilder.Stretch.None;
+        protected float height;
 
-        public IList<VertexPositionNormalTextureMod> Vertices
+        public BaseBuilding(Vector3 center, int stories, Vector2 baseDimensions)
         {
-            get { return vertices.AsReadOnly(); }
-        }
-
-        public IList<int> Indices
-        {
-            get { return indices.AsReadOnly(); }
-        }
-    }
-
-    public class SimpleBuilding : BaseBuilding
-    {
-        public SimpleBuilding(Vector3 center, int stories, Vector2 baseDimensions)
-        {
-            Vector3 origin = center - new Vector3(baseDimensions.X * (BuildingBuilder.storyDimensions.X / 2.0f), 0.0f, baseDimensions.Y * (BuildingBuilder.storyDimensions.Z / 2.0f)); ;
-
-            Vector3 colorMod;
+            origin = center - new Vector3(baseDimensions.X * (BuildingBuilder.storyDimensions.X / 2.0f), 0.0f, baseDimensions.Y * (BuildingBuilder.storyDimensions.Z / 2.0f)); ;
+            height = (float)stories;
 
             float tint = 1.0f - (0.2f * (float)BuildingBuilder.rand.NextDouble());
             switch (BuildingBuilder.rand.Next(3))
@@ -217,21 +208,47 @@ namespace Cityscape
                     break;
             }
 
-            BuildingBuilder.Stretch stretch = BuildingBuilder.Stretch.None;
             switch(BuildingBuilder.rand.Next(3))
             {
                 case 0: stretch = BuildingBuilder.Stretch.None; break;
                 case 1: stretch = BuildingBuilder.Stretch.Horizontal; break;
-                case 2: stretch = BuildingBuilder.Stretch.Vertical; break;
+                case 2: if (stories % 2 == 0) { stretch = BuildingBuilder.Stretch.Vertical; } break;
             }
+        }
 
+        protected void AddBox(Vector3 dimensions)
+        {
+            BuildingBuilder.AddBox(
+                ref vertices, ref indices,
+                origin, BuildingBuilder.storyDimensions, dimensions,
+                colorMod, stretch);
+        }
+ 
+        protected void AddBox(Vector3 offset, Vector3 dimensions)
+        {
+            BuildingBuilder.AddBox(
+                ref vertices, ref indices,
+                origin + offset, BuildingBuilder.storyDimensions, dimensions,
+                colorMod, stretch);
+        }
+
+        public IList<VertexPositionNormalTextureMod> Vertices
+        {
+            get { return vertices.AsReadOnly(); }
+        }
+
+        public IList<int> Indices
+        {
+            get { return indices.AsReadOnly(); }
+        }
+    }
+
+    public class SimpleBuilding : BaseBuilding
+    {
+        public SimpleBuilding(Vector3 center, int stories, Vector2 baseDimensions) : base(center, stories, baseDimensions)
+        {
             // Base
-            BuildingBuilder.AddBox(ref vertices, ref indices,
-                origin,
-                BuildingBuilder.storyDimensions,
-                new Vector3(baseDimensions.X, 0.1f, baseDimensions.Y),
-                colorMod, stretch
-                );
+            AddBox(new Vector3(baseDimensions.X, 0.1f, baseDimensions.Y));
 
             int baseWidth = (int)baseDimensions.X, baseHeight = (int) baseDimensions.Y;
 
@@ -245,60 +262,16 @@ namespace Cityscape
             float yOffset = (float) yPos * BuildingBuilder.storyDimensions.Z;
             
             // Main
-            BuildingBuilder.AddBox(ref vertices, ref indices,
-                origin + new Vector3(xOffset, 0.0f, yOffset), 
-                BuildingBuilder.storyDimensions,
-                new Vector3((float)xSize, (float) stories, (float) ySize),
-                colorMod, stretch
-                );
+            AddBox( new Vector3(xOffset, 0.0f, yOffset), new Vector3((float)xSize, (float) stories, (float) ySize) );
         }
     }
 
     public class UglyModernBuilding : BaseBuilding
     {
-        Vector3 origin;
-        float height;
-
-        public UglyModernBuilding(Vector3 center, int stories, Vector2 baseDimensions)
+        public UglyModernBuilding(Vector3 center, int stories, Vector2 baseDimensions): base(center, stories, baseDimensions)
         {
-            this.origin = center - new Vector3(baseDimensions.X * (BuildingBuilder.storyDimensions.X / 2.0f), 0.0f, baseDimensions.Y * (BuildingBuilder.storyDimensions.Z / 2.0f));;
-
-            this.height = (float)stories * BuildingBuilder.storyDimensions.Y; ;
-
-            Vector3 colorMod;
-            
-            float tint = 1.0f - (0.2f * (float)BuildingBuilder.rand.NextDouble());
-            switch( BuildingBuilder.rand.Next(3) )
-            {
-
-                case 1: // Yellow tint
-                    colorMod = new Vector3(1.0f, 1.0f, tint);
-                    break;
-
-                case 2: // Blue tint
-                    colorMod = new Vector3(tint, tint, 1.0f);
-                    break;
-
-                case 0: // White
-                default:
-                    colorMod = new Vector3(1.0f, 1.0f, 1.0f);
-                    break;
-            }
-
-            BuildingBuilder.Stretch stretch = BuildingBuilder.Stretch.None;
-            switch(BuildingBuilder.rand.Next(3))
-            {
-                case 0: stretch = BuildingBuilder.Stretch.None; break;
-                case 1: stretch = BuildingBuilder.Stretch.Horizontal; break;
-                case 2: stretch = BuildingBuilder.Stretch.Vertical; break;
-            }
             // Base
-            BuildingBuilder.AddBox(ref vertices, ref indices,
-                origin,
-                BuildingBuilder.storyDimensions,
-                new Vector3(baseDimensions.X, 0.1f, baseDimensions.Y),
-                colorMod, stretch
-                );
+            AddBox( new Vector3(baseDimensions.X, 0.1f, baseDimensions.Y) );
 
             int baseWidth = (int)baseDimensions.X, baseHeight = (int) baseDimensions.Y;
 
@@ -312,12 +285,7 @@ namespace Cityscape
             float yOffset = (float) yPos * BuildingBuilder.storyDimensions.Z;
             
             // Main
-            BuildingBuilder.AddBox(ref vertices, ref indices,
-                origin + new Vector3(xOffset, 0.0f, yOffset), 
-                BuildingBuilder.storyDimensions,
-                new Vector3((float)xSize, (float) stories, (float) ySize),
-                colorMod, stretch
-                );
+            AddBox( new Vector3(xOffset, 0.0f, yOffset), new Vector3((float)xSize, (float) stories, (float) ySize) );
 
             // Left lump
 
@@ -329,12 +297,8 @@ namespace Cityscape
 
             xOffset = (float) xPos2 * BuildingBuilder.storyDimensions.X;
             yOffset = (float) yPos2 * BuildingBuilder.storyDimensions.Z;
-            BuildingBuilder.AddBox(ref vertices, ref indices,
-                origin + new Vector3(xOffset, 0.0f, yOffset), 
-                BuildingBuilder.storyDimensions,
-                new Vector3((float)xSize2, (float) ((stories / 4) * BuildingBuilder.rand.Next(4)), (float) ySize2),
-                colorMod, stretch
-                );
+            AddBox(new Vector3(xOffset, 0.0f, yOffset),
+                   new Vector3((float)xSize2, (float) ((stories / 4) * BuildingBuilder.rand.Next(4)), (float) ySize2) );
 
             // Front lump
 
@@ -346,12 +310,8 @@ namespace Cityscape
 
             xOffset = (float) xPos2 * BuildingBuilder.storyDimensions.X;
             yOffset = (float) yPos2 * BuildingBuilder.storyDimensions.Z;
-            BuildingBuilder.AddBox(ref vertices, ref indices,
-                origin + new Vector3(xOffset, 0.0f, yOffset), 
-                BuildingBuilder.storyDimensions,
-                new Vector3((float)xSize2, (float) ((stories / 4) * BuildingBuilder.rand.Next(4)), (float) ySize2),
-                colorMod, stretch
-                );
+            AddBox(new Vector3(xOffset, 0.0f, yOffset), 
+                   new Vector3((float)xSize2, (float) ((stories / 4) * BuildingBuilder.rand.Next(4)), (float) ySize2) );
 
             // Right lump
 
@@ -363,12 +323,8 @@ namespace Cityscape
 
             xOffset = (float) xPos2 * BuildingBuilder.storyDimensions.X;
             yOffset = (float) yPos2 * BuildingBuilder.storyDimensions.Z;
-            BuildingBuilder.AddBox(ref vertices, ref indices,
-                origin + new Vector3(xOffset, 0.0f, yOffset), 
-                BuildingBuilder.storyDimensions,
-                new Vector3((float)xSize2, (float) ((stories / 4) * BuildingBuilder.rand.Next(4)), (float) ySize2),
-                colorMod, stretch
-                );
+            AddBox(new Vector3(xOffset, 0.0f, yOffset), 
+                   new Vector3((float)xSize2, (float) ((stories / 4) * BuildingBuilder.rand.Next(4)), (float) ySize2));
 
             // Back lump
 
@@ -380,12 +336,8 @@ namespace Cityscape
 
             xOffset = (float) xPos2 * BuildingBuilder.storyDimensions.X;
             yOffset = (float) yPos2 * BuildingBuilder.storyDimensions.Z;
-            BuildingBuilder.AddBox(ref vertices, ref indices,
-                origin + new Vector3(xOffset, 0.0f, yOffset), 
-                BuildingBuilder.storyDimensions,
-                new Vector3((float)xSize2, (float) ((stories / 4) * BuildingBuilder.rand.Next(4)), (float) ySize2),
-                colorMod, stretch
-                );
+            AddBox(new Vector3(xOffset, 0.0f, yOffset), 
+                   new Vector3((float)xSize2, (float) ((stories / 4) * BuildingBuilder.rand.Next(4)), (float) ySize2));
 
         }
 
