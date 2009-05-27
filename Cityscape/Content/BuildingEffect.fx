@@ -78,7 +78,7 @@ technique DefaultTechnique
     pass Pass1
     {
         // TODO: set renderstates here.
-		CullMode = NONE;
+		CullMode = ccw;
         VertexShader = compile vs_1_1 VertexShaderFunction();
         PixelShader = compile ps_1_1 PixelShaderFunction();
     }

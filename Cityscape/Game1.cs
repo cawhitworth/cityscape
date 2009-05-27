@@ -57,8 +57,8 @@ namespace Cityscape
             s = Stopwatch.StartNew();
             IBuilding bldg;
             int stories;
-            for(int x=-20; x<21; x++)
-                for (int y=-20; y <21; y++)
+            for(int x=-40; x<41; x++)
+                for (int y=-40; y <41; y++)
                 {
                     switch (rand.Next(5))
                     {
