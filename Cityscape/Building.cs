@@ -174,6 +174,112 @@ namespace Cityscape
             indices.Add( index + 1 ); indices.Add( index + 3 ); indices.Add( index + 2 );
         }
 
+        public static void AddCylinder(ref List<VertexPositionNormalTextureMod> verts, ref List<int> indices,
+                                        Vector3 origin,
+                                        Vector3 storyDimensions,
+                                        float stories,
+                                        float diameter,
+                                        Vector3 colorMod,
+                                        Stretch stretch,
+                                        int segments)
+        {
+            float circumference = (float)Math.PI * diameter;
+            float windowsAroundCircumference = (float)Math.Floor(circumference);
+
+            float windowsPerSegment = windowsAroundCircumference / (float)segments;
+
+            float texWidth = windowsPerSegment * BuildingTextureGenerator.StoryXMultiplier;
+            float texHeight = stories * BuildingTextureGenerator.StoryYMultiplier;
+            
+            Vector2 texOrigin = new Vector2(rand.Next(64) * BuildingTextureGenerator.StoryXMultiplier, 
+                                            rand.Next(64) * BuildingTextureGenerator.StoryYMultiplier);
+
+
+            switch (stretch)
+            {
+                case Stretch.Horizontal:
+                    texWidth /= 2.0f;
+                    break;
+                case Stretch.Vertical:
+                    texHeight /= 2.0f;
+                    break;
+            }
+
+            Vector2 texBottomLeft = texOrigin + new Vector2(0.0f, 0.0f);
+            Vector2 texTopLeft = texOrigin + new Vector2(0.0f, texHeight);
+
+            float height = stories * storyDimensions.Y;
+            float angle = 0;
+            Vector3 normal = new Vector3();
+            Vector3 position;
+            int baseIndex = verts.Count(); 
+            
+            // Vertices
+            for(int segment = 0; segment < segments + 1; segment++)
+            {
+                normal.X = (float)Math.Sin((double)angle);
+                normal.Y = 0.0f;
+                normal.Z = (float)Math.Cos((double)angle);
+                position = normal;
+                position *= (diameter * storyDimensions.X) / 2.0f;
+                position += origin;
+
+                verts.Add(new VertexPositionNormalTextureMod(position, normal, texBottomLeft, colorMod));
+                position += new Vector3(0.0f, height, 0.0f);
+                verts.Add(new VertexPositionNormalTextureMod(position, normal, texTopLeft, colorMod));
+
+                texBottomLeft += new Vector2(texWidth, 0.0f);
+                texTopLeft += new Vector2(texWidth, 0.0f);
+                angle += (2.0f * (float)(Math.PI)) / (float)segments;
+            }
+
+            int thisSegment, nextSegment;
+            // Indices
+            for(int segment = 0; segment < segments; segment++)
+            {
+                thisSegment = baseIndex + (segment * 2);
+                nextSegment = thisSegment + 2;
+//                if (nextSegment >= baseIndex + (segments * 2))
+//                    nextSegment = baseIndex ;
+
+                indices.Add(thisSegment); indices.Add(thisSegment + 1); indices.Add(nextSegment);
+                indices.Add(nextSegment); indices.Add(thisSegment + 1); indices.Add(nextSegment+1);
+            }
+            
+            // Cap
+
+            baseIndex = verts.Count();
+            // Vertices
+            normal = new Vector3(0.0f, 1.0f, 0.0f);
+            texBottomLeft = new Vector2(0.0f, 0.0f);
+            angle = 0;
+            position.Y = 0.0f;
+            for(int segment = 0; segment < segments + 1; segment++)
+            {
+                position.X = (float)Math.Sin((double)angle);
+                position.Z = (float)Math.Cos((double)angle);
+                position *= (diameter * storyDimensions.X) / 2.0f;
+
+                position.Y = height;
+                position += origin;
+
+                verts.Add(new VertexPositionNormalTextureMod(position, normal, texBottomLeft, colorMod));
+                angle += (2.0f * (float)(Math.PI)) / (float)segments;
+            }
+
+            int centerIndex = verts.Count();
+            verts.Add(new VertexPositionNormalTextureMod(origin + new Vector3(0.0f, height, 0.0f), normal, texBottomLeft, colorMod));
+
+            // indices
+            for(int segment = 0; segment < segments; segment++)
+            {
+                indices.Add(baseIndex + segment); indices.Add(centerIndex);
+                if (segment < segments)
+                    indices.Add(baseIndex + segment + 1);
+                else
+                    indices.Add(baseIndex);
+            }
+        }
     }
 
     public class BaseBuilding : IBuilding
@@ -232,6 +338,15 @@ namespace Cityscape
                 colorMod, stretch);
         }
 
+        protected void AddCylinder(int stories, float diameter, int segments)
+        {
+            BuildingBuilder.AddCylinder(
+                ref vertices, ref indices,
+                origin, BuildingBuilder.storyDimensions,
+                (float) stories, diameter,
+                colorMod, stretch, segments);
+        }
+
         public IList<VertexPositionNormalTextureMod> Vertices
         {
             get { return vertices.AsReadOnly(); }
@@ -263,6 +378,15 @@ namespace Cityscape
             
             // Main
             AddBox( new Vector3(xOffset, 0.0f, yOffset), new Vector3((float)xSize, (float) stories, (float) ySize) );
+        }
+    }
+
+    public class SimpleCylinderBuilding : BaseBuilding
+    {
+        public SimpleCylinderBuilding(Vector3 center, int stories, Vector2 baseDimensions) : base(center, stories, baseDimensions)
+        {
+//            AddBox(new Vector3(baseDimensions.X, 0.1f, baseDimensions.Y));
+            AddCylinder(stories, (float)BuildingBuilder.rand.Next((int)baseDimensions.X), 16);
         }
     }
 

@@ -57,10 +57,10 @@ namespace Cityscape
             s = Stopwatch.StartNew();
             IBuilding bldg;
             int stories;
-            for(int x=-40; x<41; x++)
-                for (int y=-40; y <41; y++)
+            for(int x=-20; x<21; x++)
+                for (int y=-20; y <21; y++)
                 {
-                    switch (rand.Next(5))
+/*                    switch (rand.Next(5))
                     {
                         case 0:
                             stories = 30 + rand.Next(30);
@@ -79,7 +79,8 @@ namespace Cityscape
                         default:
                             bldg = null;
                             break;
-                    }
+                    }*/
+                    bldg = new SimpleCylinderBuilding(new Vector3(x * 2, 0.0f, y * 2), 10 + rand.Next(15), new Vector2(20.0f, 20.0f));
 
                     buildings.AddBuilding(bldg);
                 }
@@ -107,10 +108,10 @@ namespace Cityscape
             textPos = new Vector2(graphics.GraphicsDevice.Viewport.Width / 8,
                                   graphics.GraphicsDevice.Viewport.Height / 8);
 
-            graphics.PreferredBackBufferHeight = graphics.GraphicsDevice.DisplayMode.Height;
-            graphics.PreferredBackBufferWidth = graphics.GraphicsDevice.DisplayMode.Width;
+//            graphics.PreferredBackBufferHeight = graphics.GraphicsDevice.DisplayMode.Height;
+//            graphics.PreferredBackBufferWidth = graphics.GraphicsDevice.DisplayMode.Width;
 
-            graphics.ToggleFullScreen();
+//            graphics.ToggleFullScreen();
             base.Initialize();
 
         }
