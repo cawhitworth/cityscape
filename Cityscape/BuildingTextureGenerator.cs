@@ -65,6 +65,7 @@ namespace Cityscape
                 int width = rand.Next(textureWidth / (4 * windowWidth)) + 1;
                 if (width + startX > (textureWidth / windowWidth) ) width = (textureWidth / windowWidth) - startX;
                 int lines = rand.Next(2) + 1;
+                if (startY - lines < 0) startY = lines;
                 for(int line = 0; line < lines; line++)
                 {
                     for (int xx = startX; xx < startX + width; xx++)
