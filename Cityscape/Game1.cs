@@ -60,7 +60,7 @@ namespace Cityscape
             for(int x=-20; x<21; x++)
                 for (int y=-20; y <21; y++)
                 {
-/*                    switch (rand.Next(5))
+                    switch (rand.Next(5))
                     {
                         case 0:
                             stories = 30 + rand.Next(30);
@@ -71,7 +71,11 @@ namespace Cityscape
                             bldg = new UglyModernBuilding(new Vector3(x*2, 0.0f, y*2), stories, new Vector2(20.0f, 20.0f));
                             break;
                         case 2:
+                            bldg = new SimpleCylinderBuilding(new Vector3(x * 2, 0.0f, y * 2), 30 + rand.Next(15), new Vector2(20.0f, 20.0f));
+                            break;
                         case 3:
+                            bldg = new SimpleCylinderBuilding(new Vector3(x * 2, 0.0f, y * 2), 5 + rand.Next(10), new Vector2(20.0f, 20.0f));
+                            break;
                         case 4:
                             stories = 5 + rand.Next(10);
                             bldg = new SimpleBuilding(new Vector3(x*2, 0.0f, y*2), stories, new Vector2(20.0f, 20.0f));
@@ -79,8 +83,7 @@ namespace Cityscape
                         default:
                             bldg = null;
                             break;
-                    }*/
-                    bldg = new SimpleCylinderBuilding(new Vector3(x * 2, 0.0f, y * 2), 10 + rand.Next(15), new Vector2(20.0f, 20.0f));
+                    }
 
                     buildings.AddBuilding(bldg);
                 }

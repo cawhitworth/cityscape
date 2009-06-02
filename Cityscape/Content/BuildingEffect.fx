@@ -62,7 +62,7 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 {
     float4 col = tex2D(smpBld, input.Tex0) * float4(input.Mod, 0.0f);
     
-    float4 fogColour = float4(0.0f, 0.0f, 0.8f, 0.0f);
+    float4 fogColour = float4(0.0f, 0.0f, 0.1f, 0.0f);
     return lerp(fogColour, input.Diffuse * col, input.Fogging);
 }
 
@@ -78,6 +78,7 @@ technique DefaultTechnique
     pass Pass1
     {
         // TODO: set renderstates here.
+		CullMode = ccw;
         VertexShader = compile vs_1_1 VertexShaderFunction();
         PixelShader = compile ps_1_1 PixelShaderFunction();
     }

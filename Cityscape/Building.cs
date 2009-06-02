@@ -287,12 +287,14 @@ namespace Cityscape
         protected List<VertexPositionNormalTextureMod> vertices = new List<VertexPositionNormalTextureMod>();
         protected List<int> indices = new List<int>();
         protected Vector3 origin;
+        protected Vector3 center;
         protected Vector3 colorMod;
         protected BuildingBuilder.Stretch stretch = BuildingBuilder.Stretch.None;
         protected float height;
 
         public BaseBuilding(Vector3 center, int stories, Vector2 baseDimensions)
         {
+            this.center = center;
             origin = center - new Vector3(baseDimensions.X * (BuildingBuilder.storyDimensions.X / 2.0f), 0.0f, baseDimensions.Y * (BuildingBuilder.storyDimensions.Z / 2.0f)); ;
             height = (float)stories;
 
@@ -342,7 +344,7 @@ namespace Cityscape
         {
             BuildingBuilder.AddCylinder(
                 ref vertices, ref indices,
-                origin, BuildingBuilder.storyDimensions,
+                center, BuildingBuilder.storyDimensions,
                 (float) stories, diameter,
                 colorMod, stretch, segments);
         }
@@ -385,7 +387,7 @@ namespace Cityscape
     {
         public SimpleCylinderBuilding(Vector3 center, int stories, Vector2 baseDimensions) : base(center, stories, baseDimensions)
         {
-//            AddBox(new Vector3(baseDimensions.X, 0.1f, baseDimensions.Y));
+            AddBox(new Vector3(baseDimensions.X, 0.1f, baseDimensions.Y));
             AddCylinder(stories, (float)BuildingBuilder.rand.Next((int)baseDimensions.X), 16);
         }
     }
