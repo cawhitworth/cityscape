@@ -57,9 +57,8 @@ namespace Cityscape
             s = Stopwatch.StartNew();
             IBuilding bldg;
             int stories;
-            
-            for(int x=-30; x<31; x++)
-                for (int y=-30; y <31; y++)
+            for(int x=-20; x<21; x++)
+                for (int y=-20; y <21; y++)
                 {
                     switch (rand.Next(5))
                     {
@@ -75,6 +74,8 @@ namespace Cityscape
                             bldg = new ManchesterHilton(new Vector3(x * 2, 0.0f, y * 2), 4 * (8 + rand.Next(8)), new Vector2(20.0f, 20.0f));
                             break;
                         case 3:
+                            bldg = new SimpleCylinderBuilding(new Vector3(x * 2, 0.0f, y * 2), 5 + rand.Next(10), new Vector2(20.0f, 20.0f));
+                            break;
                         case 4:
                             stories = 5 + rand.Next(10);
                             bldg = new SimpleBuilding(new Vector3(x*2, 0.0f, y*2), stories, new Vector2(20.0f, 20.0f));
