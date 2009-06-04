@@ -64,8 +64,25 @@ namespace Cityscape
             float texDepth = stories.Z * BuildingTextureGenerator.StoryXMultiplier;
             float texHeight = stories.Y * BuildingTextureGenerator.StoryYMultiplier;
 
-            Vector2 texOrigin = new Vector2(rand.Next(64) * BuildingTextureGenerator.StoryXMultiplier, 
+            Vector2 faceTexScale = new Vector2(1.0f, 1.0f);
+            Vector2 texOrigin;
+            switch (stretch)
+            {
+                case Stretch.Horizontal:
+                    faceTexScale.Y = 0.5f;
+                    texOrigin = new Vector2(rand.Next(32) * 2 * BuildingTextureGenerator.StoryXMultiplier, 
                                             rand.Next(64) * BuildingTextureGenerator.StoryYMultiplier);
+                    break;
+                case Stretch.Vertical:
+                    faceTexScale.X = 0.5f;
+                    texOrigin = new Vector2(rand.Next(64) * BuildingTextureGenerator.StoryXMultiplier, 
+                                            rand.Next(32) * 2 * BuildingTextureGenerator.StoryYMultiplier);
+                    break;
+                default:
+                    texOrigin = new Vector2(rand.Next(64) * BuildingTextureGenerator.StoryXMultiplier, 
+                                            rand.Next(64) * BuildingTextureGenerator.StoryYMultiplier);
+                    break;
+            }
 
             Vector2 texBottomLeft = texOrigin + new Vector2(0.0f, 0.0f);
             Vector2 texBottomRight = texOrigin + new Vector2(texWidth, 0.0f);
@@ -77,17 +94,7 @@ namespace Cityscape
             Vector2 texTopLeftBlack = new Vector2(0.0f, 0.0f);
             Vector2 texTopRightBlack = new Vector2(0.0f, 0.0f);
 
-            Vector2 faceTexScale = new Vector2(1.0f, 1.0f);
 
-            switch (stretch)
-            {
-                case Stretch.Horizontal:
-                    faceTexScale.Y = 0.5f;
-                    break;
-                case Stretch.Vertical:
-                    faceTexScale.X = 0.5f;
-                    break;
-            }
 
             // Front face
             int index =  verts.Count();
@@ -183,12 +190,10 @@ namespace Cityscape
         protected Vector3 origin;
         protected Vector3 colorMod;
         protected BuildingBuilder.Stretch stretch = BuildingBuilder.Stretch.None;
-        protected float height;
 
         public BaseBuilding(Vector3 center, int stories, Vector2 baseDimensions)
         {
             origin = center - new Vector3(baseDimensions.X * (BuildingBuilder.storyDimensions.X / 2.0f), 0.0f, baseDimensions.Y * (BuildingBuilder.storyDimensions.Z / 2.0f)); ;
-            height = (float)stories;
 
             float tint = 1.0f - (0.2f * (float)BuildingBuilder.rand.NextDouble());
             switch (BuildingBuilder.rand.Next(3))
@@ -263,6 +268,49 @@ namespace Cityscape
             
             // Main
             AddBox( new Vector3(xOffset, 0.0f, yOffset), new Vector3((float)xSize, (float) stories, (float) ySize) );
+        }
+    }
+
+    public class ManchesterHilton : BaseBuilding
+    {
+        public ManchesterHilton(Vector3 center, int stories, Vector2 baseDimensions) : base(center, stories, baseDimensions)
+        {
+            // Base
+            AddBox(new Vector3(baseDimensions.X, 0.1f, baseDimensions.Y));
+            int baseWidth = (int)baseDimensions.X, baseHeight = (int) baseDimensions.Y;
+
+            int longSide = (baseWidth / 2) + BuildingBuilder.rand.Next(baseWidth / 4);
+            int shortSide = (baseWidth / 8) + BuildingBuilder.rand.Next(baseWidth / 8);
+
+            int xSize, ySize, orientation = BuildingBuilder.rand.Next(2);
+            if (orientation == 0)
+            {
+                xSize = longSide; ySize = shortSide;
+            }
+            else
+            {
+                ySize = longSide; xSize = shortSide;
+            }
+
+            int xPos = BuildingBuilder.rand.Next(baseWidth - (xSize + 2)) + 1;
+            int yPos = BuildingBuilder.rand.Next(baseHeight - (ySize + 2)) + 1;
+
+            float xOffset = (float) xPos * BuildingBuilder.storyDimensions.X;
+            float yOffset = (float) yPos * BuildingBuilder.storyDimensions.Z;
+
+            AddBox( new Vector3(xOffset, 0.0f, yOffset), new Vector3((float)xSize, (float) stories / 2, (float) ySize) );
+
+            if (orientation == 0)
+            {
+                ySize += 2;
+            }
+            else
+            {
+                xSize += 2;
+            }
+
+            AddBox( new Vector3(xOffset, (float)stories * 0.5f * BuildingBuilder.storyDimensions.Y, yOffset), 
+                new Vector3((float)xSize, (float) stories / 2, (float) ySize) );
         }
     }
 

@@ -57,8 +57,9 @@ namespace Cityscape
             s = Stopwatch.StartNew();
             IBuilding bldg;
             int stories;
-            for(int x=-40; x<41; x++)
-                for (int y=-40; y <41; y++)
+            
+            for(int x=-30; x<31; x++)
+                for (int y=-30; y <31; y++)
                 {
                     switch (rand.Next(5))
                     {
@@ -71,6 +72,8 @@ namespace Cityscape
                             bldg = new UglyModernBuilding(new Vector3(x*2, 0.0f, y*2), stories, new Vector2(20.0f, 20.0f));
                             break;
                         case 2:
+                            bldg = new ManchesterHilton(new Vector3(x * 2, 0.0f, y * 2), 4 * (8 + rand.Next(8)), new Vector2(20.0f, 20.0f));
+                            break;
                         case 3:
                         case 4:
                             stories = 5 + rand.Next(10);
@@ -84,9 +87,6 @@ namespace Cityscape
                     buildings.AddBuilding(bldg);
                 }
 
-
-//            bldg = new SimpleBuilding(new Vector3(0.0f, 0.0f, 0.0f), 1, new Vector2(2000.0f, 2000.0f));
-//            buildings.AddBuilding(bldg);
 
             s.Stop();
             System.Console.WriteLine(s.ElapsedMilliseconds);
@@ -107,10 +107,10 @@ namespace Cityscape
             textPos = new Vector2(graphics.GraphicsDevice.Viewport.Width / 8,
                                   graphics.GraphicsDevice.Viewport.Height / 8);
 
-            graphics.PreferredBackBufferHeight = graphics.GraphicsDevice.DisplayMode.Height;
-            graphics.PreferredBackBufferWidth = graphics.GraphicsDevice.DisplayMode.Width;
+//            graphics.PreferredBackBufferHeight = graphics.GraphicsDevice.DisplayMode.Height;
+//            graphics.PreferredBackBufferWidth = graphics.GraphicsDevice.DisplayMode.Width;
 
-            graphics.ToggleFullScreen();
+//            graphics.ToggleFullScreen();
             base.Initialize();
 
         }
