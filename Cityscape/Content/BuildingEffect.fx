@@ -53,7 +53,7 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
     float dist = length(viewPosition);
     
     output.Fogging = 1 / (0.1f * dist);
-    output.Diffuse = (diffuse * atten) + Ambient;
+    output.Diffuse = (diffuse) + Ambient;
 
     return output;
 }

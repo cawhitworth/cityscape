@@ -57,6 +57,7 @@ namespace Cityscape
             s = Stopwatch.StartNew();
             IBuilding bldg;
             int stories;
+            /*
             for(int x=-20; x<21; x++)
                 for (int y=-20; y <21; y++)
                 {
@@ -87,6 +88,10 @@ namespace Cityscape
 
                     buildings.AddBuilding(bldg);
                 }
+             * */
+
+            bldg = new SimpleCylinderBuilding(new Vector3(0.0f, 0.0f, 0.0f), 30, new Vector2(20.0f, 20.0f));
+            buildings.AddBuilding(bldg);
 
 
             s.Stop();
