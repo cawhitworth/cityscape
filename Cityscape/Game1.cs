@@ -57,6 +57,7 @@ namespace Cityscape
             s = Stopwatch.StartNew();
             IBuilding bldg;
             int stories;
+            /*
             for(int x=-20; x<21; x++)
                 for (int y=-20; y <21; y++)
                 {
@@ -71,7 +72,7 @@ namespace Cityscape
                             bldg = new UglyModernBuilding(new Vector3(x*2, 0.0f, y*2), stories, new Vector2(20.0f, 20.0f));
                             break;
                         case 2:
-                            bldg = new SimpleCylinderBuilding(new Vector3(x * 2, 0.0f, y * 2), 30 + rand.Next(15), new Vector2(20.0f, 20.0f));
+                            bldg = new ManchesterHilton(new Vector3(x * 2, 0.0f, y * 2), 4 * (8 + rand.Next(8)), new Vector2(20.0f, 20.0f));
                             break;
                         case 3:
                             bldg = new SimpleCylinderBuilding(new Vector3(x * 2, 0.0f, y * 2), 5 + rand.Next(10), new Vector2(20.0f, 20.0f));
@@ -87,10 +88,11 @@ namespace Cityscape
 
                     buildings.AddBuilding(bldg);
                 }
+             * */
 
+            bldg = new SimpleCylinderBuilding(new Vector3(0.0f, 0.0f, 0.0f), 30, new Vector2(20.0f, 20.0f));
+            buildings.AddBuilding(bldg);
 
-//            bldg = new SimpleBuilding(new Vector3(0.0f, 0.0f, 0.0f), 1, new Vector2(2000.0f, 2000.0f));
-//            buildings.AddBuilding(bldg);
 
             s.Stop();
             System.Console.WriteLine(s.ElapsedMilliseconds);

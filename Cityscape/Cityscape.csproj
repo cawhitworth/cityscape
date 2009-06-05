@@ -84,8 +84,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Building Types\BeethamTower.cs" />
+    <Compile Include="Building Types\SimpleBuilding.cs" />
+    <Compile Include="Building Types\SimpleCylinderBuilding.cs" />
+    <Compile Include="Building Types\UglyModernBuilding.cs" />
     <Compile Include="Building.cs" />
     <Compile Include="BuildingBatch.cs" />
+    <Compile Include="BuildingBuilder.cs" />
     <Compile Include="BuildingTextureGenerator.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="FrameCounter.cs" />
