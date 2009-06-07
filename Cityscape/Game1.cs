@@ -28,7 +28,7 @@ namespace Cityscape
         SpriteFont font;
         Vector2 textPos;
         BuildingBatch buildings;
-        Color backgroundCol = new Color(0.0f, 0.0f, 0.1f);
+        Color backgroundCol = new Color(0.0f, 0.0f, 0.5f);
         static Random rand = new Random();
 
         public Game1()
@@ -57,11 +57,11 @@ namespace Cityscape
             s = Stopwatch.StartNew();
             IBuilding bldg;
             int stories;
-            /*
+            
             for(int x=-20; x<21; x++)
                 for (int y=-20; y <21; y++)
                 {
-                    switch (rand.Next(5))
+                    switch (3)
                     {
                         case 0:
                             stories = 30 + rand.Next(30);
@@ -88,10 +88,11 @@ namespace Cityscape
 
                     buildings.AddBuilding(bldg);
                 }
-             * */
 
-            bldg = new SimpleCylinderBuilding(new Vector3(0.0f, 0.0f, 0.0f), 30, new Vector2(20.0f, 20.0f));
-            buildings.AddBuilding(bldg);
+//            bldg = new TestBuilding(new Vector3(0.0f, 0.0f, 0.0f),
+//                                    10,
+//                                    new Vector2(20.0f, 20.0f));
+//            buildings.AddBuilding(bldg);
 
 
             s.Stop();

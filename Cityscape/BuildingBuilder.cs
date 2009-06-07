@@ -19,7 +19,155 @@ namespace Cityscape
         public static readonly Vector3 storyDimensions = new Vector3(0.1f, 0.1f, 0.1f);
         public enum Stretch { None, Horizontal, Vertical };
 
+        public static void AddPlane(ref List<VertexPositionNormalTextureMod> verts, ref List<int> indices,
+                                    Vector3 position,
+                                    Vector2 dimensions)
+        {
+            Vector2 texCoord = new Vector2(0.0f, 0.0f);
+            Vector3 up = new Vector3(0.0f, 1.0f, 0.0f);
+            Vector3 mod = new Vector3(1.0f, 1.0f, 1.0f);
+            int baseIndex = verts.Count();
+            verts.Add(new VertexPositionNormalTextureMod(position, up, texCoord, mod));
+            verts.Add(new VertexPositionNormalTextureMod(position + new Vector3(0.0f, 0.0f, -dimensions.Y), up, texCoord, mod));
+            verts.Add(new VertexPositionNormalTextureMod(position + new Vector3(dimensions.X, 0.0f, 0.0f), up, texCoord, mod));
+            verts.Add(new VertexPositionNormalTextureMod(position + new Vector3(dimensions.X, 0.0f, -dimensions.Y), up, texCoord, mod));
+            indices.Add(baseIndex); indices.Add(baseIndex + 1); indices.Add(baseIndex + 2);
+            indices.Add(baseIndex + 2); indices.Add(baseIndex + 1); indices.Add(baseIndex + 3);
+        }
+
+        public static void AddBlankPanel(ref List<VertexPositionNormalTextureMod> verts, ref List<int> indices,
+                                    Vector3 position,
+                                    Vector2 stories,
+                                    Vector2 XZ)
+        {
+            AddPanel(ref verts, ref indices, position, stories, new Vector2(0.0f, 0.0f), XZ, false, new Vector3(0.0f, 0.0f, 0.0f), Stretch.None);
+        }
+
+        public static void AddPanel(ref List<VertexPositionNormalTextureMod> verts, ref List<int> indices,
+                                    Vector3 position,
+                                    Vector2 stories,
+                                    Vector2 textOrigin,
+                                    Vector2 XZ,
+                                    bool textured,
+                                    Vector3 colorMod,
+                                    Stretch stretch)
+        {
+            Vector2 text2;
+            float xScale = 1.0f, yScale = 1.0f;
+
+            switch(stretch)
+            {
+                case Stretch.Horizontal:
+                    xScale = 0.5f;
+                    break;
+                case Stretch.Vertical:
+                    yScale = 0.5f;
+                    break;
+            }
+
+            if (textured)
+                text2 = textOrigin + new Vector2(stories.X * xScale * BuildingTextureGenerator.StoryXMultiplier,
+                                                 stories.Y * yScale * BuildingTextureGenerator.StoryYMultiplier);
+            else
+                text2 = textOrigin;
+
+
+            AddPanel(ref verts, ref indices, position,
+                     new Vector2(stories.X * storyDimensions.X, stories.Y * storyDimensions.Y),
+                     textOrigin,
+                     text2,
+                     XZ,
+                     colorMod);
+        }
+        
+        public static void AddPanel(ref List<VertexPositionNormalTextureMod> verts, ref List<int> indices,
+                                    Vector3 position,
+                                    Vector2 dimensions,
+                                    Vector2 texture1,
+                                    Vector2 texture2,
+                                    Vector2 XZ,
+                                    Vector3 colorMod)
+        {
+            Vector3 oppositeCorner = position + new Vector3(dimensions.X * XZ.X, dimensions.Y, dimensions.X * XZ.Y);
+
+            Vector3 topLeft = new Vector3(position.X, oppositeCorner.Y, position.Z);
+            Vector3 bottomRight = new Vector3(oppositeCorner.X, position.Y, oppositeCorner.Z);
+
+            Vector2 textTopLeft = new Vector2(texture1.X, texture2.Y);
+            Vector2 textBottomRight = new Vector2(texture2.X, texture1.Y);
+
+            Vector3 normal = - Vector3.Cross( topLeft - position, bottomRight - position);
+
+            int baseIndex = verts.Count();
+            verts.Add(new VertexPositionNormalTextureMod(position, normal, texture1, colorMod));
+            verts.Add(new VertexPositionNormalTextureMod(topLeft, normal, textTopLeft, colorMod));
+            verts.Add(new VertexPositionNormalTextureMod(bottomRight, normal, textBottomRight, colorMod));
+            verts.Add(new VertexPositionNormalTextureMod(oppositeCorner, normal, texture2, colorMod));
+            indices.Add(baseIndex); indices.Add(baseIndex + 1); indices.Add(baseIndex + 2);
+            indices.Add(baseIndex + 2); indices.Add(baseIndex + 1); indices.Add(baseIndex + 3);
+        }
+
+        public static void AddPanelBox(ref List<VertexPositionNormalTextureMod> verts, ref List<int> indices,
+                                   Vector3 position,
+                                   Vector3 storyDimensions,
+                                   Vector3 stories,
+                                   Vector3 colorMod,
+                                   Stretch stretch)
+        {
+            Vector3 dimensions = new Vector3(stories.X * storyDimensions.X, stories.Y * storyDimensions.Y, stories.Z * storyDimensions.Z);
+            Vector2 texOrigin;
+            float texWidth = stories.X * BuildingTextureGenerator.StoryXMultiplier;
+            float texDepth = stories.Z * BuildingTextureGenerator.StoryXMultiplier;
+
+            switch (stretch)
+            {
+                case Stretch.Horizontal:
+                    texOrigin = new Vector2(rand.Next(32) * 2 * BuildingTextureGenerator.StoryXMultiplier,
+                                            rand.Next(64) * BuildingTextureGenerator.StoryYMultiplier);
+                    break;
+                case Stretch.Vertical:
+                    texOrigin = new Vector2(rand.Next(64) * BuildingTextureGenerator.StoryXMultiplier,
+                                            rand.Next(32) * 2 * BuildingTextureGenerator.StoryYMultiplier);
+                    break;
+                default:
+                    texOrigin = new Vector2(rand.Next(64) * BuildingTextureGenerator.StoryXMultiplier,
+                                            rand.Next(64) * BuildingTextureGenerator.StoryYMultiplier);
+                    break;
+            }
+            
+            // Front
+            AddPanel(ref verts, ref indices, position,
+                     new Vector2(stories.X, stories.Y), texOrigin, new Vector2(1.0f, 0.0f), true, colorMod, stretch);
+            // Right
+            texOrigin.X += texWidth;
+            AddPanel(ref verts, ref indices, position + new Vector3(dimensions.X, 0.0f, 0.0f),
+                     new Vector2(stories.Z, stories.Y), texOrigin, new Vector2(0.0f, -1.0f), true, colorMod, stretch);
+            // Back
+            texOrigin.X += texDepth;
+            AddPanel(ref verts, ref indices, position + new Vector3(dimensions.X, 0.0f, -dimensions.Z),
+                     new Vector2(stories.X, stories.Y), texOrigin, new Vector2(-1.0f, 0.0f), true, colorMod, stretch);
+            // Left
+            texOrigin.X += texWidth;
+            AddPanel(ref verts, ref indices, position + new Vector3(0.0f, 0.0f, -dimensions.Z),
+                     new Vector2(stories.Z, stories.Y), texOrigin, new Vector2(0.0f, 1.0f), true, colorMod, stretch);
+
+            // Top
+            AddPlane(ref verts, ref indices, position + new Vector3(0.0f, stories.Y * BuildingBuilder.storyDimensions.Y, 0.0f),
+                new Vector2(stories.X * storyDimensions.X, stories.Z * storyDimensions.Z));
+
+        }
+
         public static void AddBox(ref List<VertexPositionNormalTextureMod> verts, ref List<int> indices,
+                                   Vector3 position,
+                                   Vector3 storyDimensions,
+                                   Vector3 stories,
+                                   Vector3 colorMod,
+                                   Stretch stretch)
+        {
+            AddPanelBox(ref verts, ref indices, position, storyDimensions, stories, colorMod, stretch);
+        }
+
+        public static void DeprecatedAddBox(ref List<VertexPositionNormalTextureMod> verts, ref List<int> indices,
                                    Vector3 position,
                                    Vector3 storyDimensions,
                                    Vector3 stories,
@@ -225,9 +373,9 @@ namespace Cityscape
                 position.Z *= (diameter2 * storyDimensions.X) / 2.0f;
                 position += origin;
 
-                verts.Add(new VertexPositionNormalTextureMod(position, normal, texBottomLeft, colorMod));
+              //  verts.Add(new VertexPositionNormalTextureMod(position, normal, texBottomLeft, colorMod));
                 position += new Vector3(0.0f, height, 0.0f);
-                verts.Add(new VertexPositionNormalTextureMod(position, normal, texTopLeft, colorMod));
+              //  verts.Add(new VertexPositionNormalTextureMod(position, normal, texTopLeft, colorMod));
 
                 texBottomLeft += new Vector2(texWidth, 0.0f);
                 texTopLeft += new Vector2(texWidth, 0.0f);
@@ -241,11 +389,12 @@ namespace Cityscape
             {
                 thisSegment = baseIndex + (segment * 2);
                 nextSegment = thisSegment + 2;
-                indices.Add(thisSegment); indices.Add(thisSegment + 1); indices.Add(nextSegment);
-                indices.Add(nextSegment); indices.Add(thisSegment + 1); indices.Add(nextSegment + 1);
+             //   indices.Add(thisSegment); indices.Add(thisSegment + 1); indices.Add(nextSegment);
+             //   indices.Add(nextSegment); indices.Add(thisSegment + 1); indices.Add(nextSegment + 1);
             }
             // Cap
 
+            angle = 0;
             baseIndex = verts.Count();
             // Vertices
             normal = new Vector3(0.0f, 1.0f, 0.0f);
@@ -272,7 +421,8 @@ namespace Cityscape
             // indices
             for (int segment = 0; segment < segments; segment++)
             {
-                indices.Add(baseIndex + segment); indices.Add(centerIndex);
+                indices.Add(baseIndex + segment); 
+                indices.Add(centerIndex);
                 if (segment < segments)
                     indices.Add(baseIndex + segment + 1);
                 else

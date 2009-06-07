@@ -13,13 +13,19 @@ using Microsoft.Xna.Framework.Storage;
 
 namespace Cityscape
 {
-    public class SimpleCylinderBuilding : BaseBuilding
+    class TestBuilding : BaseBuilding
     {
-        public SimpleCylinderBuilding(Vector3 center, int stories, Vector2 baseDimensions)
+        public TestBuilding(Vector3 center, int stories, Vector2 baseDimensions)
             : base(center, stories, baseDimensions)
         {
             //AddBox(new Vector3(baseDimensions.X, 0.1f, baseDimensions.Y));
-            AddCylinder(stories, (float)BuildingBuilder.rand.Next((int)baseDimensions.X), 16);
+
+            BuildingBuilder.AddPanelBox(ref vertices, ref indices,
+                                        new Vector3(0.0f, 0.0f, 0.0f),
+                                        BuildingBuilder.storyDimensions,
+                                        new Vector3(10.0f, 10.0f, 10.0f),
+                                        new Vector3(1.0f, 1.0f, 1.0f),
+                                        BuildingBuilder.Stretch.None);
         }
     }
 }
