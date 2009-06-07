@@ -18,7 +18,7 @@ namespace Cityscape
         public SimpleCylinderBuilding(Vector3 center, int stories, Vector2 baseDimensions)
             : base(center, stories, baseDimensions)
         {
-            //AddBox(new Vector3(baseDimensions.X, 0.1f, baseDimensions.Y));
+            AddBox(new Vector3(baseDimensions.X, 0.1f, baseDimensions.Y));
             AddCylinder(stories, (float)BuildingBuilder.rand.Next((int)baseDimensions.X), 16);
         }
     }

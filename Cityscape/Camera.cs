@@ -32,7 +32,7 @@ namespace Cityscape
         float angle;
         Vector3 cameraPos, right, up, lookAt;
 
-        Vector3 position = new Vector3(0.0f, 5.0f, 0.0f);
+        Vector3 position = new Vector3(0.0f, 1.0f, 5.0f);
         float hAngle = 0.0f, vAngle = -0.25f;
 
         public Camera(Game game)

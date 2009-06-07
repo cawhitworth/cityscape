@@ -28,9 +28,9 @@ namespace Cityscape
             Vector3 mod = new Vector3(1.0f, 1.0f, 1.0f);
             int baseIndex = verts.Count();
             verts.Add(new VertexPositionNormalTextureMod(position, up, texCoord, mod));
-            verts.Add(new VertexPositionNormalTextureMod(position + new Vector3(0.0f, 0.0f, -dimensions.Y), up, texCoord, mod));
+            verts.Add(new VertexPositionNormalTextureMod(position + new Vector3(0.0f, 0.0f, dimensions.Y), up, texCoord, mod));
             verts.Add(new VertexPositionNormalTextureMod(position + new Vector3(dimensions.X, 0.0f, 0.0f), up, texCoord, mod));
-            verts.Add(new VertexPositionNormalTextureMod(position + new Vector3(dimensions.X, 0.0f, -dimensions.Y), up, texCoord, mod));
+            verts.Add(new VertexPositionNormalTextureMod(position + new Vector3(dimensions.X, 0.0f, dimensions.Y), up, texCoord, mod));
             indices.Add(baseIndex); indices.Add(baseIndex + 1); indices.Add(baseIndex + 2);
             indices.Add(baseIndex + 2); indices.Add(baseIndex + 1); indices.Add(baseIndex + 3);
         }
@@ -96,7 +96,7 @@ namespace Cityscape
             Vector2 textTopLeft = new Vector2(texture1.X, texture2.Y);
             Vector2 textBottomRight = new Vector2(texture2.X, texture1.Y);
 
-            Vector3 normal = - Vector3.Cross( topLeft - position, bottomRight - position);
+            Vector3 normal = Vector3.Cross( topLeft - position, bottomRight - position);
 
             int baseIndex = verts.Count();
             verts.Add(new VertexPositionNormalTextureMod(position, normal, texture1, colorMod));
@@ -137,19 +137,19 @@ namespace Cityscape
             
             // Front
             AddPanel(ref verts, ref indices, position,
-                     new Vector2(stories.X, stories.Y), texOrigin, new Vector2(1.0f, 0.0f), true, colorMod, stretch);
+                     new Vector2(stories.X, stories.Y), texOrigin, new Vector2(1.0f, 0.0f), true, colorMod , stretch);
             // Right
             texOrigin.X += texWidth;
             AddPanel(ref verts, ref indices, position + new Vector3(dimensions.X, 0.0f, 0.0f),
-                     new Vector2(stories.Z, stories.Y), texOrigin, new Vector2(0.0f, -1.0f), true, colorMod, stretch);
+                     new Vector2(stories.Z, stories.Y), texOrigin, new Vector2(0.0f, 1.0f), true, colorMod, stretch);
             // Back
             texOrigin.X += texDepth;
-            AddPanel(ref verts, ref indices, position + new Vector3(dimensions.X, 0.0f, -dimensions.Z),
+            AddPanel(ref verts, ref indices, position + new Vector3(dimensions.X, 0.0f, dimensions.Z),
                      new Vector2(stories.X, stories.Y), texOrigin, new Vector2(-1.0f, 0.0f), true, colorMod, stretch);
             // Left
             texOrigin.X += texWidth;
-            AddPanel(ref verts, ref indices, position + new Vector3(0.0f, 0.0f, -dimensions.Z),
-                     new Vector2(stories.Z, stories.Y), texOrigin, new Vector2(0.0f, 1.0f), true, colorMod, stretch);
+            AddPanel(ref verts, ref indices, position + new Vector3(0.0f, 0.0f, dimensions.Z),
+                     new Vector2(stories.Z, stories.Y), texOrigin, new Vector2(0.0f, -1.0f), true, colorMod, stretch);
 
             // Top
             AddPlane(ref verts, ref indices, position + new Vector3(0.0f, stories.Y * BuildingBuilder.storyDimensions.Y, 0.0f),
@@ -373,9 +373,9 @@ namespace Cityscape
                 position.Z *= (diameter2 * storyDimensions.X) / 2.0f;
                 position += origin;
 
-              //  verts.Add(new VertexPositionNormalTextureMod(position, normal, texBottomLeft, colorMod));
+                verts.Add(new VertexPositionNormalTextureMod(position, normal, texBottomLeft, colorMod));
                 position += new Vector3(0.0f, height, 0.0f);
-              //  verts.Add(new VertexPositionNormalTextureMod(position, normal, texTopLeft, colorMod));
+                verts.Add(new VertexPositionNormalTextureMod(position, normal, texTopLeft, colorMod));
 
                 texBottomLeft += new Vector2(texWidth, 0.0f);
                 texTopLeft += new Vector2(texWidth, 0.0f);
@@ -389,8 +389,8 @@ namespace Cityscape
             {
                 thisSegment = baseIndex + (segment * 2);
                 nextSegment = thisSegment + 2;
-             //   indices.Add(thisSegment); indices.Add(thisSegment + 1); indices.Add(nextSegment);
-             //   indices.Add(nextSegment); indices.Add(thisSegment + 1); indices.Add(nextSegment + 1);
+                indices.Add(thisSegment); indices.Add(thisSegment + 1); indices.Add(nextSegment);
+                indices.Add(nextSegment); indices.Add(thisSegment + 1); indices.Add(nextSegment + 1);
             }
             // Cap
 
@@ -409,9 +409,9 @@ namespace Cityscape
 
                 position.Y = height;
                 position += origin;
-
+                
                 verts.Add(new VertexPositionNormalTextureMod(position, normal, texBottomLeft, colorMod));
-
+                angle += angleStep;
             }
 
             int centerIndex = verts.Count();
