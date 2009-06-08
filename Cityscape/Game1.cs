@@ -58,7 +58,7 @@ namespace Cityscape
             IBuilding bldg;
             int stories;
             
-#if (true)
+#if (false)
             for(int x=-20; x<21; x++)
                 for (int y=-20; y <21; y++)
                 {

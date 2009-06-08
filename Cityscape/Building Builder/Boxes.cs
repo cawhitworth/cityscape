@@ -83,5 +83,56 @@ namespace Cityscape
         {
             AddSimplePanelBox(ref verts, ref indices, position, stories, colorMod, stretch);
         }
+
+        public static void AddPanelledBox(ref List<VertexPositionNormalTextureMod> verts, ref List<int> indices,
+                                    Vector3 position,
+                                    float height, float panelWidth, float spacerWidth, int nPanelsWide, int nPanelsDeep,
+                                    Vector3 colorMod, Stretch stretch)
+        {
+            Vector3 dimensions = new Vector3(( (panelWidth * nPanelsWide) + (spacerWidth * (nPanelsWide-1))) * storyDimensions.X,
+                                              height * storyDimensions.Y,
+                                             ( (panelWidth * nPanelsDeep) + (spacerWidth * (nPanelsDeep-1))) * storyDimensions.Z);
+            Vector2 texOrigin;
+            float texWidth = (panelWidth * nPanelsWide) * BuildingTextureGenerator.StoryXMultiplier;
+            float texDepth = (panelWidth * nPanelsDeep) * BuildingTextureGenerator.StoryXMultiplier;
+
+            switch (stretch)
+            {
+                case Stretch.Horizontal:
+                    texOrigin = new Vector2(rand.Next(32) * 2 * BuildingTextureGenerator.StoryXMultiplier,
+                                            rand.Next(64) * BuildingTextureGenerator.StoryYMultiplier);
+                    break;
+                case Stretch.Vertical:
+                    texOrigin = new Vector2(rand.Next(64) * BuildingTextureGenerator.StoryXMultiplier,
+                                            rand.Next(32) * 2 * BuildingTextureGenerator.StoryYMultiplier);
+                    break;
+                default:
+                    texOrigin = new Vector2(rand.Next(64) * BuildingTextureGenerator.StoryXMultiplier,
+                                            rand.Next(64) * BuildingTextureGenerator.StoryYMultiplier);
+                    break;
+            }
+
+            // These are badly misnamed, because of the handedness issue. By "Front", I probably mean "Back"
+
+            // Front
+            AddColumnedPanel(ref verts, ref indices, position,
+                     height, panelWidth, spacerWidth, nPanelsWide, texOrigin, new Vector2(1.0f, 0.0f), colorMod, stretch);
+            // Right
+            texOrigin.X += texWidth;
+            AddColumnedPanel(ref verts, ref indices, position + new Vector3(dimensions.X, 0.0f, 0.0f),
+                     height, panelWidth, spacerWidth, nPanelsDeep, texOrigin, new Vector2(0.0f, 1.0f), colorMod, stretch);
+            // Back
+            texOrigin.X += texDepth;
+            AddColumnedPanel(ref verts, ref indices, position + new Vector3(dimensions.X, 0.0f, dimensions.Z),
+                     height, panelWidth, spacerWidth, nPanelsWide, texOrigin, new Vector2(-1.0f, 0.0f), colorMod, stretch);
+            // Left
+            texOrigin.X += texWidth;
+            AddColumnedPanel(ref verts, ref indices, position + new Vector3(0.0f, 0.0f, dimensions.Z),
+                     height, panelWidth, spacerWidth, nPanelsDeep, texOrigin, new Vector2(0.0f, -1.0f), colorMod, stretch);
+
+            // Top
+            AddPlane(ref verts, ref indices, position + new Vector3(0.0f, height * BuildingBuilder.storyDimensions.Y, 0.0f),
+                new Vector2(dimensions.X, dimensions.Z));
+        }
     }
 }
