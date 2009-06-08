@@ -1,15 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.GamerServices;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
-using Microsoft.Xna.Framework.Net;
-using Microsoft.Xna.Framework.Storage;
 
 namespace Cityscape
 {
@@ -18,7 +9,7 @@ namespace Cityscape
         public ManchesterHilton(Vector3 center, int stories, Vector2 baseDimensions) : base(center, stories, baseDimensions)
         {
             // Base
-            AddBox(new Vector3(baseDimensions.X, 0.1f, baseDimensions.Y));
+            AddSimpleBox(new Vector3(baseDimensions.X, 0.1f, baseDimensions.Y));
             int baseWidth = (int)baseDimensions.X, baseHeight = (int) baseDimensions.Y;
 
             int longSide = (baseWidth / 2) + BuildingBuilder.rand.Next(baseWidth / 4);
@@ -40,7 +31,7 @@ namespace Cityscape
             float xOffset = (float) xPos * BuildingBuilder.storyDimensions.X;
             float yOffset = (float) yPos * BuildingBuilder.storyDimensions.Z;
 
-            AddBox( new Vector3(xOffset, 0.0f, yOffset), new Vector3((float)xSize, (float) stories / 2, (float) ySize) );
+            AddSimpleBox( new Vector3(xOffset, 0.0f, yOffset), new Vector3((float)xSize, (float) stories / 2, (float) ySize) );
 
             if (orientation == 0)
             {
@@ -51,7 +42,7 @@ namespace Cityscape
                 xSize += 2;
             }
 
-            AddBox( new Vector3(xOffset, (float)stories * 0.5f * BuildingBuilder.storyDimensions.Y, yOffset), 
+            AddSimpleBox( new Vector3(xOffset, (float)stories * 0.5f * BuildingBuilder.storyDimensions.Y, yOffset), 
                 new Vector3((float)xSize, (float) stories / 2, (float) ySize) );
         }
     }
