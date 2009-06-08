@@ -66,19 +66,19 @@ namespace Cityscape
             }
         }
 
-        protected void AddBox(Vector3 dimensions)
+        protected void AddSimpleBox(Vector3 dimensions)
         {
-            BuildingBuilder.AddBox(
+            BuildingBuilder.AddSimpleBox(
                 ref vertices, ref indices,
-                origin, BuildingBuilder.storyDimensions, dimensions,
+                origin, dimensions,
                 colorMod, stretch);
         }
  
-        protected void AddBox(Vector3 offset, Vector3 dimensions)
+        protected void AddSimpleBox(Vector3 offset, Vector3 dimensions)
         {
-            BuildingBuilder.AddBox(
+            BuildingBuilder.AddSimpleBox(
                 ref vertices, ref indices,
-                origin + offset, BuildingBuilder.storyDimensions, dimensions,
+                origin + offset, dimensions,
                 colorMod, stretch);
         }
 

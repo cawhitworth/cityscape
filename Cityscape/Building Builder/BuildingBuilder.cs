@@ -13,13 +13,11 @@ using Microsoft.Xna.Framework.Storage;
 
 namespace Cityscape
 {
-    public class SimpleCylinderBuilding : BaseBuilding
+    public partial class BuildingBuilder
     {
-        public SimpleCylinderBuilding(Vector3 center, int stories, Vector2 baseDimensions)
-            : base(center, stories, baseDimensions)
-        {
-            AddSimpleBox(new Vector3(baseDimensions.X, 0.1f, baseDimensions.Y));
-            AddCylinder(stories, (float)BuildingBuilder.rand.Next((int)baseDimensions.X), 16);
-        }
+        public static Random rand = new Random();
+        public static readonly Vector3 storyDimensions = new Vector3(0.1f, 0.1f, 0.1f);
+        public enum Stretch { None, Horizontal, Vertical };
+
     }
 }
