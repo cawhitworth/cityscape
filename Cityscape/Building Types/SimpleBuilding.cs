@@ -19,7 +19,7 @@ namespace Cityscape
             : base(center, stories, baseDimensions)
         {
             // Base
-            AddBox(new Vector3(baseDimensions.X, 0.1f, baseDimensions.Y));
+            AddSimpleBox(new Vector3(baseDimensions.X, 0.1f, baseDimensions.Y));
 
             int baseWidth = (int)baseDimensions.X, baseHeight = (int)baseDimensions.Y;
 
@@ -33,7 +33,7 @@ namespace Cityscape
             float yOffset = (float)yPos * BuildingBuilder.storyDimensions.Z;
 
             // Main
-            AddBox(new Vector3(xOffset, 0.0f, yOffset), new Vector3((float)xSize, (float)stories, (float)ySize));
+            AddSimpleBox(new Vector3(xOffset, 0.0f, yOffset), new Vector3((float)xSize, (float)stories, (float)ySize));
         }
     }
 }

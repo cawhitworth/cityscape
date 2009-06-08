@@ -19,7 +19,7 @@ namespace Cityscape
             : base(center, stories, baseDimensions)
         {
             // Base
-            AddBox(new Vector3(baseDimensions.X, 0.1f, baseDimensions.Y));
+            AddSimpleBox(new Vector3(baseDimensions.X, 0.1f, baseDimensions.Y));
 
             int baseWidth = (int)baseDimensions.X, baseHeight = (int)baseDimensions.Y;
 
@@ -33,7 +33,7 @@ namespace Cityscape
             float yOffset = (float)yPos * BuildingBuilder.storyDimensions.Z;
 
             // Main
-            AddBox(new Vector3(xOffset, 0.0f, yOffset), new Vector3((float)xSize, (float)stories, (float)ySize));
+            AddSimpleBox(new Vector3(xOffset, 0.0f, yOffset), new Vector3((float)xSize, (float)stories, (float)ySize));
 
             // Left lump
 
@@ -45,7 +45,7 @@ namespace Cityscape
 
             xOffset = (float)xPos2 * BuildingBuilder.storyDimensions.X;
             yOffset = (float)yPos2 * BuildingBuilder.storyDimensions.Z;
-            AddBox(new Vector3(xOffset, 0.0f, yOffset),
+            AddSimpleBox(new Vector3(xOffset, 0.0f, yOffset),
                    new Vector3((float)xSize2, (float)((stories / 4) * BuildingBuilder.rand.Next(4)), (float)ySize2));
 
             // Front lump
@@ -58,7 +58,7 @@ namespace Cityscape
 
             xOffset = (float)xPos2 * BuildingBuilder.storyDimensions.X;
             yOffset = (float)yPos2 * BuildingBuilder.storyDimensions.Z;
-            AddBox(new Vector3(xOffset, 0.0f, yOffset),
+            AddSimpleBox(new Vector3(xOffset, 0.0f, yOffset),
                    new Vector3((float)xSize2, (float)((stories / 4) * BuildingBuilder.rand.Next(4)), (float)ySize2));
 
             // Right lump
@@ -71,7 +71,7 @@ namespace Cityscape
 
             xOffset = (float)xPos2 * BuildingBuilder.storyDimensions.X;
             yOffset = (float)yPos2 * BuildingBuilder.storyDimensions.Z;
-            AddBox(new Vector3(xOffset, 0.0f, yOffset),
+            AddSimpleBox(new Vector3(xOffset, 0.0f, yOffset),
                    new Vector3((float)xSize2, (float)((stories / 4) * BuildingBuilder.rand.Next(4)), (float)ySize2));
 
             // Back lump
@@ -84,7 +84,7 @@ namespace Cityscape
 
             xOffset = (float)xPos2 * BuildingBuilder.storyDimensions.X;
             yOffset = (float)yPos2 * BuildingBuilder.storyDimensions.Z;
-            AddBox(new Vector3(xOffset, 0.0f, yOffset),
+            AddSimpleBox(new Vector3(xOffset, 0.0f, yOffset),
                    new Vector3((float)xSize2, (float)((stories / 4) * BuildingBuilder.rand.Next(4)), (float)ySize2));
 
         }
