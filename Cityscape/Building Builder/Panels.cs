@@ -132,5 +132,28 @@ namespace Cityscape
             indices.Add(baseIndex); indices.Add(baseIndex + 1); indices.Add(baseIndex + 2);
             indices.Add(baseIndex + 2); indices.Add(baseIndex + 1); indices.Add(baseIndex + 3);
         }
+
+        public static void AddColumnedPanel(ref List<VertexPositionNormalTextureMod> verts, ref List<int> indices,
+                                    Vector3 position,
+                                    float height, float panelWidth, float spacerWidth, int nPanels,
+                                    Vector2 textureOrigin,
+                                    Vector2 XZ,
+                                    Vector3 colorMod, Stretch stretch)
+        {
+            Vector2 panelDimensions = new Vector2(panelWidth, height);
+            Vector2 spacerDimensions = new Vector2(spacerWidth, height);
+            AddPanel(ref verts, ref indices, position, panelDimensions, textureOrigin, XZ, true, colorMod, stretch);
+            for(int panel = 1; panel < nPanels; panel++)
+            {
+                position.X += panelWidth * (storyDimensions.X * XZ.X);
+                position.Z += panelWidth * (storyDimensions.Z * XZ.Y);
+                AddPanel(ref verts, ref indices, position, spacerDimensions, textureOrigin, XZ, false, colorMod, stretch);
+
+                position.X += spacerWidth * (storyDimensions.X * XZ.X);
+                position.Z += spacerWidth * (storyDimensions.Z * XZ.Y);
+                textureOrigin.X += panelWidth * BuildingTextureGenerator.StoryXMultiplier;
+                AddPanel(ref verts, ref indices, position, panelDimensions, textureOrigin, XZ, true, colorMod, stretch);
+            }
+        }
     }
 }
