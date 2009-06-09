@@ -26,7 +26,7 @@ namespace Cityscape
 
                 AddBlackBox(offset * BuildingBuilder.storyDimensions, dimensions);
                 offset.Y += capHeight;
-                AddPanelledBox(offset * BuildingBuilder.storyDimensions, initHeight, windowWidth, spacerWidth, (int)xPanels, (int)zPanels);
+                AddColumnedBox(offset * BuildingBuilder.storyDimensions, initHeight, windowWidth, spacerWidth, (int)xPanels, (int)zPanels);
             }
         }
     }

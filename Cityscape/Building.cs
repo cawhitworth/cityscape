@@ -91,10 +91,18 @@ namespace Cityscape
                 stretch);
         }
 
-        protected void AddPanelledBox(Vector3 offset, float height, float windowWidth, float spacerWidth,
+        protected void AddColumnedBox(Vector3 storyDimensions, int windowWidth, int spacerWidth)
+        {
+            BuildingBuilder.AddColumnedBox(ref vertices, ref indices,
+                origin, storyDimensions,
+                windowWidth, spacerWidth,
+                colorMod, stretch);
+        }
+
+        protected void AddColumnedBox(Vector3 offset, float height, float windowWidth, float spacerWidth,
                                       int nPanelsWide, int nPanelsDeep)
         {
-            BuildingBuilder.AddPanelledBox(ref vertices, ref indices,
+            BuildingBuilder.AddColumnedBox(ref vertices, ref indices,
                 origin+offset, height, windowWidth, spacerWidth, nPanelsWide, nPanelsDeep,
                 colorMod, stretch);
         }
