@@ -88,6 +88,7 @@
     <Compile Include="Building Builder\Cylinder.cs" />
     <Compile Include="Building Builder\Panels.cs" />
     <Compile Include="Building Types\BeethamTower.cs" />
+    <Compile Include="Building Types\ClassicBuilding.cs" />
     <Compile Include="Building Types\SimpleBuilding.cs" />
     <Compile Include="Building Types\SimpleCylinderBuilding.cs" />
     <Compile Include="Building Types\TestBuilding.cs" />
