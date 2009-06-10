@@ -134,6 +134,88 @@ namespace Cityscape
         }
 
         public static void AddColumnedPanel(ref List<VertexPositionNormalTextureMod> verts, ref List<int> indices,
+                                    Vector3 basePosition,
+                                    Vector2 dimensions,
+                                    int desiredWidth, int sepWidth,
+                                    Vector2 textureOrigin,
+                                    Vector2 XZ, Vector3 colorMod, Stretch stretch)
+        {
+            Vector3 position = basePosition;
+            // WWW-W-WWW is the minimum we want to do
+            // 
+            if (dimensions.X <= (float)(desiredWidth * 2 + sepWidth + 2))
+            {
+                AddPanel(ref verts, ref indices, position, dimensions, textureOrigin, XZ, true, colorMod, stretch);
+                return;
+            }
+            Vector2 panelDimensions = new Vector2((float)desiredWidth, dimensions.Y);
+            Vector2 spacerDimensions = new Vector2((float) sepWidth, dimensions.Y);
+
+            float offset = 0.0f;
+            Vector3 offsetPosition = new Vector3(0.0f);
+
+            AddPanel(ref verts, ref indices, position, panelDimensions, textureOrigin, XZ, true, colorMod, stretch);
+            offset += panelDimensions.X;
+            offsetPosition.X = offset * storyDimensions.X * XZ.X;
+            offsetPosition.Z = offset * storyDimensions.Z * XZ.Y;
+            AddPanel(ref verts, ref indices, position + offsetPosition, spacerDimensions, textureOrigin, XZ, false, colorMod, stretch);
+            offset += spacerDimensions.X;
+            offsetPosition.X = offset * storyDimensions.X * XZ.X;
+            offsetPosition.Z = offset * storyDimensions.Z * XZ.Y;
+            textureOrigin.X += panelDimensions.X * BuildingTextureGenerator.StoryXMultiplier;
+
+            bool done = false;
+            float midPoint = dimensions.X / 2.0f;
+            while (!done)
+            {
+                if (offset + panelDimensions.X + spacerDimensions.X > midPoint)
+                {
+                    float tempWidth = 2.0f * (midPoint - offset);
+                    AddPanel(ref verts, ref indices, position + offsetPosition, new Vector2(tempWidth, panelDimensions.Y),
+                        textureOrigin, XZ, true, colorMod, stretch);
+                    offset += tempWidth;
+
+                    offsetPosition.X = offset * storyDimensions.X * XZ.X;
+                    offsetPosition.Z = offset * storyDimensions.Z * XZ.Y;
+                    textureOrigin.X += tempWidth * BuildingTextureGenerator.StoryXMultiplier;
+                    done = true;
+                }
+                else if (position.X == midPoint)
+                {
+                    done = true;
+                }
+                else
+                {
+                    AddPanel(ref verts, ref indices, position + offsetPosition, panelDimensions, textureOrigin, XZ, true, colorMod, stretch);
+                    offset += panelDimensions.X;
+                    offsetPosition.X = offset * storyDimensions.X * XZ.X;
+                    offsetPosition.Z = offset * storyDimensions.Z * XZ.Y;
+                    AddPanel(ref verts, ref indices, position + offsetPosition, spacerDimensions, textureOrigin, XZ, false, colorMod, stretch);
+                    offset += spacerDimensions.X;
+                    offsetPosition.X = offset * storyDimensions.X * XZ.X;
+                    offsetPosition.Z = offset * storyDimensions.Z * XZ.Y;
+
+                    textureOrigin.X += panelDimensions.X * BuildingTextureGenerator.StoryXMultiplier;
+                }
+            }
+
+            while (offset < dimensions.X)
+            {
+                AddPanel(ref verts, ref indices, position + offsetPosition, spacerDimensions, textureOrigin, XZ, false, colorMod, stretch);
+                offset += spacerDimensions.X;
+                offsetPosition.X = offset * storyDimensions.X * XZ.X;
+                offsetPosition.Z = offset * storyDimensions.Z * XZ.Y;
+
+                AddPanel(ref verts, ref indices, position + offsetPosition, panelDimensions, textureOrigin, XZ, true, colorMod, stretch);
+                offset += panelDimensions.X;
+                offsetPosition.X = offset * storyDimensions.X * XZ.X;
+                offsetPosition.Z = offset * storyDimensions.Z * XZ.Y;
+                textureOrigin.X += panelDimensions.X * BuildingTextureGenerator.StoryXMultiplier;
+            }
+
+        }
+
+        public static void AddColumnedPanel(ref List<VertexPositionNormalTextureMod> verts, ref List<int> indices,
                                     Vector3 position,
                                     float height, float panelWidth, float spacerWidth, int nPanels,
                                     Vector2 textureOrigin,
