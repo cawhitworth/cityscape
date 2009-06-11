@@ -91,15 +91,15 @@ namespace Cityscape
                 }
 #else
 
-            bldg = new TestBuilding(new Vector3(0.0f, 0.0f, 0.0f),
+/*            bldg = new TestBuilding(new Vector3(0.0f, 0.0f, 0.0f),
                                     10,
-                                    new Vector2(20.0f, 20.0f));
-/*            bldg = new ClassicBuilding(new Vector3(0.0f, 0.0f, 0.0f),
-                                        20,
+                                    new Vector2(20.0f, 20.0f));*/
+            bldg = new ClassicBuilding(new Vector3(0.0f, 0.0f, 0.0f),
+                                        21,
                                         new Vector2(20.0f, 20.0f),
                                         3.0f, 1.0f,
-                                        10, 1.0f,
-                                        2.0f, 1.0f);*/
+                                        10, 0.85f, 0.85f,
+                                        2.0f, 1.0f);
             buildings.AddBuilding(bldg);
 #endif
 

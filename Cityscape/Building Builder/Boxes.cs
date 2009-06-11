@@ -115,7 +115,7 @@ namespace Cityscape
                 new Vector2(stories.X * storyDimensions.X, stories.Z * storyDimensions.Z));
         }
 
-        public static void AddColumnedBox(ref List<VertexPositionNormalTextureMod> verts, ref List<int> indices,
+        public static void AddColumnedBoxSizedByColumns(ref List<VertexPositionNormalTextureMod> verts, ref List<int> indices,
                                     Vector3 position,
                                     float height, float windowWidth, float spacerWidth, int nPanelsWide, int nPanelsDeep,
                                     Vector3 colorMod, Stretch stretch)

@@ -8,25 +8,28 @@ namespace Cityscape
     {
         public ClassicBuilding(Vector3 center, int stories, Vector2 baseDimensions,
             float windowWidth, float spacerWidth,
-            int initHeight, float tierScale,
+            int initHeight, float vTierScale, float hTierScale,
             float capHeight, float capOverhang) : base(center, stories, baseDimensions)
         {
-            int totalHeight = initHeight;
+            int totalHeight = 0;
+            Vector3 dimensions = new Vector3(baseDimensions.X, capHeight, baseDimensions.Y);
+            Vector3 offset = new Vector3((baseDimensions.X - dimensions.X) / 2.0f,
+                                          0.0f,
+                                         (baseDimensions.Y - dimensions.Z) / 2.0f);
             while (totalHeight < stories)
             {
-
-                float xPanels = 1.0f + (float)Math.Floor((baseDimensions.X - windowWidth) / (windowWidth + spacerWidth));
-                float zPanels = 1.0f + (float)Math.Floor((baseDimensions.Y - windowWidth) / (windowWidth + spacerWidth));
-                Vector3 dimensions = new Vector3(xPanels * windowWidth + (xPanels - 1) * spacerWidth,
-                                                 capHeight,
-                                                 zPanels * windowWidth + (zPanels - 1) * spacerWidth);
-                Vector3 offset = new Vector3((baseDimensions.X - dimensions.X) / 2.0f,
-                                              0.0f,
-                                             (baseDimensions.Y - dimensions.Y) / 2.0f);
-
+                totalHeight += initHeight;
+                dimensions.Y = capHeight;
                 AddBlackBox(offset * BuildingBuilder.storyDimensions, dimensions);
                 offset.Y += capHeight;
-                AddColumnedBox(offset * BuildingBuilder.storyDimensions, initHeight, windowWidth, spacerWidth, (int)xPanels, (int)zPanels);
+                dimensions.Y = (float) initHeight;
+                AddColumnedBox(offset * BuildingBuilder.storyDimensions, dimensions, 3, 1);
+                offset.Y += initHeight;
+                dimensions *= hTierScale; 
+                dimensions.X = (float)Math.Floor(dimensions.X); dimensions.Z = (float)Math.Floor(dimensions.Z);
+                offset.X = (baseDimensions.X - dimensions.X) / 2.0f;
+                offset.Z = (baseDimensions.Y - dimensions.Z) / 2.0f;
+                initHeight = (int)((float)initHeight * vTierScale);
             }
         }
     }
