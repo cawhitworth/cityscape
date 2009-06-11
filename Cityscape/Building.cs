@@ -124,6 +124,32 @@ namespace Cityscape
                 colorMod, stretch, segments);
         }
 
+        protected void AddRoofDecoration(Vector3 centerTop, Vector2 dimensions)
+        {
+            int count = BuildingBuilder.rand.Next(1, 3);
+            dimensions.X *= BuildingBuilder.storyDimensions.X;
+            dimensions.Y *= BuildingBuilder.storyDimensions.Z;
+
+            Vector3 position;
+            Vector3 size = new Vector3();
+            for(int item = 0; item < count; item ++)
+            {
+                position = centerTop;
+                position.X -= ((float)BuildingBuilder.rand.NextDouble() * dimensions.X * 0.5f);
+                position.Z -= ((float)BuildingBuilder.rand.NextDouble() * dimensions.Y * 0.5f);
+
+                float xmax = (centerTop.X + dimensions.X / 2.0f) - position.X;
+                float zmax = (centerTop.Z + dimensions.Y / 2.0f) - position.Z;
+
+                size.X = (float)BuildingBuilder.rand.NextDouble() * xmax;
+                size.Y = (float)BuildingBuilder.rand.NextDouble() * (3.0f * BuildingBuilder.storyDimensions.Y);
+                size.Z = (float)BuildingBuilder.rand.NextDouble() * zmax;
+                
+
+                AddBlackBox(position, size / BuildingBuilder.storyDimensions);
+            }
+        }
+
         public IList<VertexPositionNormalTextureMod> Vertices
         {
             get { return vertices.AsReadOnly(); }
