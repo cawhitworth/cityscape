@@ -64,11 +64,10 @@ namespace Cityscape
                 {
                     switch (rand.Next(4))
                     {
-/*                        case 0:
-                            stories = 30 + rand.Next(30);
-                            bldg = new UglyModernBuilding(new Vector3(x*4, 0.0f, y*4), stories, new Vector2(40.0f, 40.0f));
-                            break;*/
                         case 0:
+                            stories = 30 + rand.Next(30);
+                            bldg = new UglyModernBuilding(new Vector3(x*3, 0.0f, y*3), stories, new Vector2(20.0f, 20.0f));
+                            break;
                         case 1:
                             stories = 40 + rand.Next(15);
                             bldg = new ClassicBuilding(new Vector3(x*3, 0.0f, y*3), stories, new Vector2(20.0f, 20.0f),
@@ -77,7 +76,7 @@ namespace Cityscape
                                 2.0f, 1.0f + (float)(rand.NextDouble() * 0.2));
                             break;
                         case 2:
-                            bldg = new ManchesterHilton(new Vector3(x * 3, 0.0f, y * 3), 4 * (8 + rand.Next(8)), new Vector2(20.0f, 20.0f));
+                            bldg = new ManchesterHilton(new Vector3(x * 3, 0.0f, y * 3), 4 * (12 + rand.Next(6)), new Vector2(20.0f, 20.0f));
                             break;
                         case 3:
                             bldg = new SimpleCylinderBuilding(new Vector3(x * 3, 0.0f, y * 3), 25 + rand.Next(15), new Vector2(20.0f, 20.0f));
