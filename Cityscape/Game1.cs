@@ -58,7 +58,7 @@ namespace Cityscape
             IBuilding bldg;
             int stories;
             
-#if (false)
+#if (true)
             for(int x=-20; x<21; x++)
                 for (int y=-20; y <21; y++)
                 {
@@ -66,21 +66,24 @@ namespace Cityscape
                     {
                         case 0:
                             stories = 30 + rand.Next(30);
-                            bldg = new UglyModernBuilding(new Vector3(x*2, 0.0f, y*2), stories, new Vector2(20.0f, 20.0f));
+                            bldg = new UglyModernBuilding(new Vector3(x*3, 0.0f, y*3), stories, new Vector2(20.0f, 20.0f));
                             break;
                         case 1:
-                            stories = 10 + rand.Next(15);
-                            bldg = new UglyModernBuilding(new Vector3(x*2, 0.0f, y*2), stories, new Vector2(20.0f, 20.0f));
+                            stories = 40 + rand.Next(15);
+                            bldg = new ClassicBuilding(new Vector3(x*3, 0.0f, y*3), stories, new Vector2(20.0f, 20.0f),
+                                rand.Next(3,6), rand.Next(1,3), stories / rand.Next(2,4),
+                                (float)(0.5 * rand.NextDouble() + 0.5), (float)(0.25 * rand.NextDouble() + 0.75),
+                                2.0f, 1.0f + (float)(rand.NextDouble() * 0.2));
                             break;
                         case 2:
-                            bldg = new ManchesterHilton(new Vector3(x * 2, 0.0f, y * 2), 4 * (8 + rand.Next(8)), new Vector2(20.0f, 20.0f));
+                            bldg = new ManchesterHilton(new Vector3(x * 3, 0.0f, y * 3), 4 * (12 + rand.Next(6)), new Vector2(20.0f, 20.0f));
                             break;
                         case 3:
-                            bldg = new SimpleCylinderBuilding(new Vector3(x * 2, 0.0f, y * 2), 5 + rand.Next(10), new Vector2(20.0f, 20.0f));
+                            bldg = new SimpleCylinderBuilding(new Vector3(x * 3, 0.0f, y * 3), 25 + rand.Next(15), new Vector2(20.0f, 20.0f));
                             break;
                         case 4:
                             stories = 5 + rand.Next(10);
-                            bldg = new SimpleBuilding(new Vector3(x*2, 0.0f, y*2), stories, new Vector2(20.0f, 20.0f));
+                            bldg = new SimpleBuilding(new Vector3(x*3, 0.0f, y*3), stories, new Vector2(20.0f, 20.0f));
                             break;
                         default:
                             bldg = null;

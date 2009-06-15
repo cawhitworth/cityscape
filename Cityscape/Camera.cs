@@ -74,15 +74,20 @@ namespace Cityscape
             
             KeyboardState ks = Keyboard.GetState();
 
+            float mult = 1.0f;
+            if (ks.IsKeyDown(Keys.LeftShift))
+                mult *= 2.0f;
+            if (ks.IsKeyDown(Keys.LeftControl))
+                mult *= 2.0f;
             if (ks.IsKeyDown(Keys.Left))
-                hAngle += (float)gameTime.ElapsedRealTime.Milliseconds / 1000.0f;
+                hAngle += mult * (float)gameTime.ElapsedRealTime.Milliseconds / 1000.0f;
             if (ks.IsKeyDown(Keys.Right))
-                hAngle -= (float)gameTime.ElapsedRealTime.Milliseconds / 1000.0f;
+                hAngle -= mult * (float)gameTime.ElapsedRealTime.Milliseconds / 1000.0f;
 
             if (ks.IsKeyDown(Keys.Up))
-                vAngle += (float)gameTime.ElapsedRealTime.Milliseconds / 1000.0f;
+                vAngle += mult * (float)gameTime.ElapsedRealTime.Milliseconds / 1000.0f;
             if (ks.IsKeyDown(Keys.Down))
-                vAngle -= (float)gameTime.ElapsedRealTime.Milliseconds / 1000.0f;
+                vAngle -= mult * (float)gameTime.ElapsedRealTime.Milliseconds / 1000.0f;
 
 
             cameraPos = position;
@@ -94,14 +99,14 @@ namespace Cityscape
             lookAt = position + lookDir;
 
             if (ks.IsKeyDown(Keys.A))
-                position += right * ((float)gameTime.ElapsedRealTime.Milliseconds / 1000.0f);
+                position += right * mult * ((float)gameTime.ElapsedRealTime.Milliseconds / 1000.0f);
             if (ks.IsKeyDown(Keys.D))
-                position -= right * ((float)gameTime.ElapsedRealTime.Milliseconds / 1000.0f);
+                position -= right * mult * ((float)gameTime.ElapsedRealTime.Milliseconds / 1000.0f);
 
             if (ks.IsKeyDown(Keys.W))
-                position += lookDir* ((float)gameTime.ElapsedRealTime.Milliseconds / 1000.0f);
+                position += lookDir* mult * ((float)gameTime.ElapsedRealTime.Milliseconds / 1000.0f);
             if (ks.IsKeyDown(Keys.S))
-                position -= lookDir* ((float)gameTime.ElapsedRealTime.Milliseconds / 1000.0f);
+                position -= lookDir* mult * ((float)gameTime.ElapsedRealTime.Milliseconds / 1000.0f);
 
 
             up = -Vector3.Cross(right, lookAt - cameraPos);
