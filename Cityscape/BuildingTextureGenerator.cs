@@ -8,12 +8,80 @@ namespace Cityscape
 {
     class BuildingTextureGenerator 
     {
-        public const int textureWidth = 512;
-        public const int textureHeight = 512;
+        public const int textureWidth = 1024;
+        public const int textureHeight = 1024;
         public const int windowHeight = 8;
         public const int windowWidth = 8;
 
         static Random rand = new Random();
+
+        private static Texture2D texture_= null;
+        private static IGraphicsDeviceService deviceService_ = null;
+
+        public static IGraphicsDeviceService deviceService
+        {
+            set
+            {
+                deviceService_ = value;
+            }
+        }
+
+        public static Texture2D texture
+        {
+            get
+            {
+                if (texture_ == null && deviceService_ != null)
+                {
+                    texture_ = new Texture2D(deviceService_.GraphicsDevice, textureWidth, textureHeight, 0, TextureUsage.AutoGenerateMipMap, SurfaceFormat.Color);
+                    Color[] textureData = new Color[textureWidth * textureHeight];
+                    texture_.GetData<Color>(textureData);
+                    for (int index = 0; index < textureWidth * textureHeight; index++) textureData[index].PackedValue = 0xff000000;
+
+                    // 8x8 windows?
+
+                    for (int x = 0; x < textureWidth / windowWidth; x++)
+                    {
+                        for (int y = 0; y < textureHeight / windowHeight; y++)
+                        {
+                            bool light = rand.NextDouble() > 0.9;
+                            float shade = (float)rand.NextDouble() * 0.15f;
+                            if (light)
+                                shade += 0.75f;
+
+                            DrawWindow(ref textureData, x, y, shade);
+                        }
+                    }
+
+                    // And a few streak patterns
+
+                    for (int streak = 0; streak < 10; streak++)
+                    {
+                        int startX = rand.Next(textureWidth / windowWidth);
+                        int startY = rand.Next(textureHeight / windowHeight);
+                        int width = rand.Next(textureWidth / (4 * windowWidth)) + 1;
+                        if (width + startX > (textureWidth / windowWidth)) width = (textureWidth / windowWidth) - startX;
+                        int lines = rand.Next(2) + 1;
+                        if (startY - lines < 0) startY = lines;
+                        for (int line = 0; line < lines; line++)
+                        {
+                            for (int xx = startX; xx < startX + width; xx++)
+                            {
+                                float shade = 0.65f + (float)rand.NextDouble() * 0.25f;
+                                DrawWindow(ref textureData, xx, startY - line, shade);
+                            }
+                            startX += rand.Next(6) - 3;
+                            if (startX < 0) startX = 0;
+                            if (width + startX > (textureWidth / windowWidth)) width = (textureWidth / windowWidth) - startX;
+                        }
+
+                    }
+
+                    texture_.SetData<Color>(textureData);
+                    texture_.Save("texture_.png", ImageFileFormat.Png);
+                }
+                return texture_;
+            }
+        }
 
         public static float StoryXMultiplier
         {
@@ -32,57 +100,6 @@ namespace Cityscape
             if (comp > 255) comp = 255;
             if (comp < 0) comp = 0;
             return (byte)comp;
-        }
-
-        public static Texture2D MakeTexture(GraphicsDevice device)
-        {
-            Texture2D texture = new Texture2D(device, textureWidth, textureHeight, 0, TextureUsage.AutoGenerateMipMap, SurfaceFormat.Color);
-            Color[] textureData = new Color[textureWidth*textureHeight];
-            texture.GetData<Color>(textureData);
-            for (int index = 0; index < textureWidth * textureHeight; index++) textureData[index].PackedValue = 0xff000000;
-
-            // 8x8 windows?
-
-            for (int x = 0; x < textureWidth / windowWidth; x++)
-            {
-                for (int y = 0; y < textureHeight / windowHeight; y++)
-                {
-                    bool light = rand.NextDouble() > 0.9;
-                    float shade = (float) rand.NextDouble() * 0.15f;
-                    if (light)
-                        shade += 0.75f;
-
-                    DrawWindow(ref textureData, x, y, shade);
-                }
-            }
-
-            // And a few streak patterns
-
-            for (int streak = 0; streak < 10; streak ++ )
-            {
-                int startX = rand.Next(textureWidth / windowWidth);
-                int startY = rand.Next(textureHeight / windowHeight);
-                int width = rand.Next(textureWidth / (4 * windowWidth)) + 1;
-                if (width + startX > (textureWidth / windowWidth) ) width = (textureWidth / windowWidth) - startX;
-                int lines = rand.Next(2) + 1;
-                if (startY - lines < 0) startY = lines;
-                for(int line = 0; line < lines; line++)
-                {
-                    for (int xx = startX; xx < startX + width; xx++)
-                    {
-                        float shade = 0.65f + (float) rand.NextDouble() * 0.25f;
-                        DrawWindow(ref textureData, xx, startY - line, shade);
-                    }
-                    startX += rand.Next(6) - 3;
-                    if (startX < 0) startX = 0;
-                    if (width + startX > (textureWidth / windowWidth) ) width = (textureWidth / windowWidth) - startX;
-                }
-
-            }
-
-            texture.SetData<Color>(textureData);
-            texture.Save("texture.png", ImageFileFormat.Png);
-            return texture;
         }
 
         public static void ChangeWindow(ref Texture2D texture)

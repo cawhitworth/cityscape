@@ -24,6 +24,7 @@ namespace Cityscape
         Matrix model;
         VertexDeclaration vertDecl;
         static Texture2D bldTex;
+        static Texture2D lightTex;
         int count = 0;
 
         List<VertexPositionNormalTextureMod[]> vertices = new List<VertexPositionNormalTextureMod[]>();
@@ -54,7 +55,15 @@ namespace Cityscape
             frameCounter = (IFrameCounter) Game.Services.GetService(typeof(IFrameCounter));
 
             if (bldTex == null)
-                bldTex = BuildingTextureGenerator.MakeTexture(graphicsDeviceService.GraphicsDevice);
+            {
+                BuildingTextureGenerator.deviceService = graphicsDeviceService;
+                bldTex = BuildingTextureGenerator.texture;
+            }
+            if (lightTex == null)
+            {
+                LightTextureGenerator.deviceService = graphicsDeviceService;
+                lightTex = LightTextureGenerator.texture;
+            }
             effect = Game.Content.Load<Effect>("BuildingEffect");
             vertDecl = new VertexDeclaration(graphicsDeviceService.GraphicsDevice, VertexPositionNormalTextureMod.VertexElements);
 
