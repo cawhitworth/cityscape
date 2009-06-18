@@ -89,6 +89,11 @@ namespace Cityscape
                 }
             }
 
+            if (vertArray != null)
+            {
+                vertices.Add(vertArray);
+            }
+
 
         }
 
