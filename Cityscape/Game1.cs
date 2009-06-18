@@ -99,9 +99,9 @@ namespace Cityscape
 //#else
             for(int i=0; i< 10; i++)
             {
-                particles.AddParticle(new Particle(new Vector3((float)i), Color.White));
+                particles.AddParticle(new Particle(new Vector3((float)i), Color.Blue));
             }
-            particles.RebuildBuffers(12);
+            particles.RebuildBuffers(5000);
 
 //#endif
 
