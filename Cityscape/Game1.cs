@@ -56,13 +56,14 @@ namespace Cityscape
 
             particles = new ParticleBatch(this);
             Components.Add(particles);
+            Services.AddService(typeof(IParticleService), particles);
 
             Stopwatch s;
             s = Stopwatch.StartNew();
             IBuilding bldg;
             int stories;
             
-//#if (false)
+#if (true)
             for(int x=-20; x<21; x++)
                 for (int y=-20; y <21; y++)
                 {
@@ -96,20 +97,20 @@ namespace Cityscape
 
                     buildings.AddBuilding(bldg);
                 }
-//#else
+#else
             for(int i=0; i< 10; i++)
             {
-                particles.AddParticle(new Particle(new Vector3((float)i), Color.Blue));
+                particles.AddStaticParticle(new Particle(new Vector3((float)i), Color.Blue));
             }
-            particles.RebuildBuffers(5000);
 
-//#endif
+#endif
 
             s.Stop();
             System.Console.WriteLine(s.ElapsedMilliseconds);
 
             s.Reset(); s.Start();
             buildings.UpdateGeometry(5000);
+            particles.RebuildStaticParticles(5000);
             s.Stop();
 
             System.Console.WriteLine(s.ElapsedMilliseconds);

@@ -34,6 +34,7 @@ namespace Cityscape
         IGraphicsDeviceService graphicsDeviceService;
         IFrameCounter frameCounter;
         ICamera camera;
+        IParticleService particles;
 
         public BuildingBatch(Game game)
             : base(game)
@@ -52,6 +53,7 @@ namespace Cityscape
             graphicsDeviceService = (IGraphicsDeviceService)Game.Services.GetService(typeof(IGraphicsDeviceService));
             camera = (ICamera) Game.Services.GetService(typeof(ICamera));
             frameCounter = (IFrameCounter) Game.Services.GetService(typeof(IFrameCounter));
+            particles = (IParticleService)Game.Services.GetService(typeof(IParticleService));
 
             if (bldTex == null)
             {
@@ -79,6 +81,8 @@ namespace Cityscape
             VertexPositionNormalTextureMod[] vertArray = null;
             List<int> indexBatch = null;
             short[] indexArray = null;
+            if (particles == null)
+                particles = (IParticleService)Game.Services.GetService(typeof(IParticleService));
 
             foreach(IBuilding b in buildings)
             {
@@ -107,6 +111,7 @@ namespace Cityscape
                     indexBatch.Add( i + baseIndex );
 
                 newBatch = vertBatch.Count() > batchSize;
+                particles.AddStaticParticleRange(b.Lights);
             }
             if (vertBatch != null)
             {

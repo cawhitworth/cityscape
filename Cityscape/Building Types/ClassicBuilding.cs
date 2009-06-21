@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Cityscape
 {
@@ -43,11 +44,22 @@ namespace Cityscape
                 AddBlackBox(offset * BuildingBuilder.storyDimensions, capDimensions);
 
                 offset.Y += capHeight;
-                dimensions *= hTierScale; 
+                dimensions *= hTierScale;
                 dimensions.X = (float)Math.Floor(dimensions.X); dimensions.Z = (float)Math.Floor(dimensions.Z);
-                
 
+                if (offset.Y > lightMin)
+                {
+                    float lightX = 0.05f + (capDimensions.X / 2.0f);
+                    float lightY = 0.05f + (capDimensions.Z / 2.0f);
+
+                    AddLight(new Vector3(lightX, offset.Y, lightY) * BuildingBuilder.storyDimensions, lightColor);
+                    AddLight(new Vector3(lightX, offset.Y, -lightY) * BuildingBuilder.storyDimensions, lightColor);
+                    AddLight(new Vector3(-lightX, offset.Y, lightY) * BuildingBuilder.storyDimensions, lightColor);
+                    AddLight(new Vector3(-lightX, offset.Y, -lightY) * BuildingBuilder.storyDimensions, lightColor);
+                }
             }
+
+            
             Vector3 centreTop = new Vector3(baseDimensions.X / 2.0f, offset.Y, baseDimensions.Y / 2.0f);
             centreTop *= BuildingBuilder.storyDimensions;
             AddRoofDecoration(centreTop, new Vector2(dimensions.X, dimensions.Z));
