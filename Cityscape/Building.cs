@@ -23,6 +23,10 @@ namespace Cityscape
         {
             get;
         }
+        IList<Particle> Lights
+        {
+            get;
+        }
     }
 
 
@@ -30,10 +34,13 @@ namespace Cityscape
     {
         protected List<VertexPositionNormalTextureMod> vertices = new List<VertexPositionNormalTextureMod>();
         protected List<int> indices = new List<int>();
+        protected List<Particle> lights = new List<Particle>();
         protected Vector3 origin;
         protected Vector3 center;
         protected Vector3 colorMod;
         protected BuildingBuilder.Stretch stretch = BuildingBuilder.Stretch.None;
+        protected Color lightColor;
+        protected int lightMin = 50;
 
         public BaseBuilding(Vector3 center, int stories, Vector2 baseDimensions)
         {
@@ -64,6 +71,11 @@ namespace Cityscape
                 case 1: stretch = BuildingBuilder.Stretch.Horizontal; break;
                 case 2: if (stories % 2 == 0) { stretch = BuildingBuilder.Stretch.Vertical; } break;
             }
+
+            lightColor = new Color(0.9f + (float)BuildingBuilder.rand.NextDouble() * 0.2f,
+                                          (float)BuildingBuilder.rand.NextDouble() * 0.2f,
+                                          (float)BuildingBuilder.rand.NextDouble() * 0.2f);
+
         }
 
         protected void AddSimpleBox(Vector3 storyDimensions)
@@ -150,6 +162,11 @@ namespace Cityscape
             }
         }
 
+        public void AddLight(Vector3 p, Color c)
+        {
+            lights.Add(new Particle(p + center, c));
+        }
+
         public IList<VertexPositionNormalTextureMod> Vertices
         {
             get { return vertices.AsReadOnly(); }
@@ -158,6 +175,11 @@ namespace Cityscape
         public IList<int> Indices
         {
             get { return indices.AsReadOnly(); }
+        }
+
+        public IList<Particle> Lights
+        {
+            get { return lights.AsReadOnly(); }
         }
     }
 
