@@ -25,10 +25,18 @@ namespace Cityscape
         public Color tint;
     }
 
+    public interface IParticleService
+    {
+        void AddStaticParticle(Particle p);
+        void AddStaticParticleRange(IEnumerable<Particle> p);
+        void Reset();
+        void RebuildStaticParticles(int bufferSize);
+    }
+
     /// <summary>
     /// This is a game component that implements IUpdateable.
     /// </summary>
-    public class ParticleBatch : Microsoft.Xna.Framework.DrawableGameComponent
+    public class ParticleBatch : Microsoft.Xna.Framework.DrawableGameComponent, IParticleService
     {
         List<Particle> particles = new List<Particle>();
         List<VertexPositionColorTexture[]> vertices = new List<VertexPositionColorTexture[]>();
@@ -48,14 +56,38 @@ namespace Cityscape
         {
             // TODO: Construct any child components here
             model = Matrix.Identity;
+            Reset();
         }
 
-        public void AddParticle(Particle p)
+        /// <summary>
+        /// Add a static particle: These never go away, unless the entire object is re-initialised
+        /// </summary>
+        /// <param name="p">The particle to add</param>
+        public void AddStaticParticle(Particle p)
         {
             particles.Add(p);
         }
 
-        public void RebuildBuffers(int bufferSize)
+        /// <summary>
+        /// Add several static particles.
+        /// </summary>
+        /// <param name="p"></param>
+        public void AddStaticParticleRange(IEnumerable<Particle> p)
+        {
+            particles.AddRange(p);
+        }
+
+        public void Reset()
+        {
+            particles.Clear();
+            vertices.Clear();
+        }
+
+        /// <summary>
+        /// Call this after adding new static particles, to re-initialise the vertex buffers
+        /// </summary>
+        /// <param name="bufferSize">The batch size in vertices - about 5,000 seems a good value</param>
+        public void RebuildStaticParticles(int bufferSize)
         {
             int particle = 0, offset = 0;
             VertexPositionColorTexture[] vertArray = null;
@@ -143,7 +175,7 @@ namespace Cityscape
             effect.Parameters["View"].SetValue(camera.View);
             effect.Parameters["Projection"].SetValue(camera.Projection);
             effect.Parameters["texParticle"].SetValue(lightTex);
-            effect.Parameters["Size"].SetValue(1.0f);
+            effect.Parameters["Size"].SetValue(0.1f);
             effect.Parameters["CamPos"].SetValue(camera.CameraPos);
             
             graphicsDeviceService.GraphicsDevice.VertexDeclaration = vertDecl;
@@ -160,6 +192,7 @@ namespace Cityscape
                     graphicsDeviceService.GraphicsDevice.DrawUserPrimitives<VertexPositionColorTexture>(
                         PrimitiveType.TriangleList,
                         v, 0, v.Count() / 3);
+                    frameCounter.AddRenderedPolys((uint)v.Count() / 3);
                 }
                 pass.End();
             }
