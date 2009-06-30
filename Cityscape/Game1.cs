@@ -58,6 +58,9 @@ namespace Cityscape
             Components.Add(particles);
             Services.AddService(typeof(IParticleService), particles);
 
+            CityPlanner.deviceService = (IGraphicsDeviceService)Services.GetService(typeof(IGraphicsDeviceService));
+            CityPlanner.BuildCity();
+
             Stopwatch s;
             s = Stopwatch.StartNew();
             IBuilding bldg;
@@ -159,6 +162,7 @@ namespace Cityscape
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            this.Exit();
             // Allows the game to exit
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
