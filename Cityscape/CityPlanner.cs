@@ -149,13 +149,14 @@ namespace Cityscape
             lots.Add(new Lot(0, 0, width, height));
 
             int count = 0, notSplit = 0, splitFail = 0;
-            int roadWidth = 16;
+            int roadWidth = 32;
             for(int splits = 0; splits < 50; splits++)
             {
                 List<Lot> newLots = new List<Lot>();
                 List<Road> newRoads = new List<Road>();
-                
-                if (splits % 20 == 0) roadWidth /= 2;
+
+                if (splits % 5 == 0 && roadWidth > 2)
+                    roadWidth /= 2;
 
                 foreach (Lot l in lots)
                 {
