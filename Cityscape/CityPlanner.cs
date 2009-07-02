@@ -10,8 +10,10 @@ namespace Cityscape
     public class Road
     {
         public enum Orientation { Horizontal, Vertical };
+        public enum Type { DualCarriageway, Major, Minor, Path };
         public int x, y;
         public Orientation orientation;
+        public Type type;
         public int width, length;
     }
 
@@ -100,7 +102,7 @@ namespace Cityscape
         static IGraphicsDeviceService deviceService_ = null;
         
         static Color lot = Color.Blue;
-        static Color road = Color.Gray;
+        static Dictionary<Road.Type, Color> roadColors = null;
 
         public static IGraphicsDeviceService deviceService
         {
@@ -133,12 +135,23 @@ namespace Cityscape
                     Plot(ref data, px, py, color);
         }
 
+        static void BuildRoadColors()
+        {
+            roadColors = new Dictionary<Road.Type, Color>();
+            roadColors[Road.Type.DualCarriageway] = Color.DarkRed;
+            roadColors[Road.Type.Major] = Color.Yellow;
+            roadColors[Road.Type.Minor] = Color.Gray;
+            roadColors[Road.Type.Path] = Color.DarkBlue;
+        }
+
         static void AddRoad(ref Color[] data, Road r)
         {
+            if (roadColors == null)
+                BuildRoadColors();
             if (r.orientation == Road.Orientation.Horizontal)
-                AddRect(ref data, r.x, r.y, r.length, r.width, road);
+                AddRect(ref data, r.x, r.y, r.length, r.width, roadColors[r.type]);
             else
-                AddRect(ref data, r.x, r.y, r.width, r.length, road);
+                AddRect(ref data, r.x, r.y, r.width, r.length, roadColors[r.type]);
         }
 
         public static void BuildCity()
@@ -149,14 +162,30 @@ namespace Cityscape
             lots.Add(new Lot(0, 0, width, height));
 
             int count = 0, notSplit = 0, splitFail = 0;
-            int roadWidth = 32;
+            int roadWidth = 16;
+            Road.Type roadType = Road.Type.DualCarriageway;
             for(int splits = 0; splits < 50; splits++)
             {
                 List<Lot> newLots = new List<Lot>();
                 List<Road> newRoads = new List<Road>();
 
-                if (splits % 5 == 0 && roadWidth > 2)
-                    roadWidth /= 2;
+                switch(splits)
+                {
+                    case 5:
+                        roadWidth = 8;
+                        roadType = Road.Type.Major;
+                        break;
+                    case 10:
+                        roadWidth = 4;
+                        roadType = Road.Type.Minor;
+                        break;
+                    case 15:
+                        roadWidth = 2;
+                        break;
+                    case 35:
+                        roadType = Road.Type.Path;
+                        break;
+                }
 
                 foreach (Lot l in lots)
                 {
@@ -171,6 +200,7 @@ namespace Cityscape
                     {
                         count++;
                         Tuple<Lot, Road> t = l.Split(2, roadWidth);
+                        t.Second.type = roadType;
                         if (t.First.w != 0)
                         {
                             newLots.Add(t.First);
