@@ -9,6 +9,14 @@ namespace Cityscape
         public SimpleBuilding(Vector3 center, int stories, Vector2 baseDimensions)
             : base(center, stories, baseDimensions)
         {
+            AddSimpleBox(new Vector3(baseDimensions.X, (float)stories, baseDimensions.Y));
+        }
+    }
+    public class SimpleBuildingRandom : BaseBuilding
+    {
+        public SimpleBuildingRandom(Vector3 center, int stories, Vector2 baseDimensions)
+            : base(center, stories, baseDimensions)
+        {
             // Base
             AddSimpleBox(new Vector3(baseDimensions.X, 0.1f, baseDimensions.Y));
 
