@@ -59,14 +59,14 @@ namespace Cityscape
             Services.AddService(typeof(IParticleService), particles);
 
             CityPlanner.deviceService = (IGraphicsDeviceService)Services.GetService(typeof(IGraphicsDeviceService));
-            CityPlanner.BuildCity();
+            CityPlanner.BuildCity(buildings);
 
             Stopwatch s;
             s = Stopwatch.StartNew();
             IBuilding bldg;
             int stories;
             
-#if (true)
+#if (false)
             for(int x=-20; x<21; x++)
                 for (int y=-20; y <21; y++)
                 {
@@ -100,7 +100,8 @@ namespace Cityscape
 
                     buildings.AddBuilding(bldg);
                 }
-#else
+#endif
+#if (false)
             for(int i=0; i< 10; i++)
             {
                 particles.AddStaticParticle(new Particle(new Vector3((float)i), Color.Blue));
@@ -162,7 +163,6 @@ namespace Cityscape
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            this.Exit();
             // Allows the game to exit
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();

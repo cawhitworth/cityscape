@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Cityscape
@@ -154,8 +155,13 @@ namespace Cityscape
                 AddRect(ref data, r.x, r.y, r.width, r.length, roadColors[r.type]);
         }
 
-        public static void BuildCity()
+        public static void BuildCity(BuildingBatch b)
         {
+            Texture2D city = new Texture2D(deviceService_.GraphicsDevice, width, height);
+            Color[] textureData = new Color[width * height];
+            city.GetData<Color>(textureData);
+            for(int i=0; i<width*height; i++) textureData[i] = Color.Black;
+
             List<Lot> lots = new List<Lot>();
             List<Road> roads = new List<Road>();
 
@@ -212,12 +218,16 @@ namespace Cityscape
                 }
                 lots.AddRange(newLots);
                 roads.AddRange(newRoads);
+                foreach(Lot l in lots)
+                    AddLot(ref textureData, l);
+                foreach (Road r in roads)
+                    AddRoad(ref textureData, r);
+
+                city.SetData<Color>(textureData);
+                city.Save("city"+splits.ToString()+".png", ImageFileFormat.Png);
             }
 
-            Texture2D city = new Texture2D(deviceService_.GraphicsDevice, width, height);
-            Color[] textureData = new Color[width * height];
-            city.GetData<Color>(textureData);
-            for(int i=0; i<width*height; i++) textureData[i] = Color.Black;
+
             
             foreach(Lot l in lots)
                 AddLot(ref textureData, l);
@@ -226,6 +236,20 @@ namespace Cityscape
 
             city.SetData<Color>(textureData);
             city.Save("city.png", ImageFileFormat.Png);
+
+            foreach(Lot l in lots)
+            {
+                Vector3 centre = new Vector3( (float)(l.x) + (float)(l.w) / 2.0f,
+                                              0.0f,
+                                              (float)(l.y) + (float)(l.h) / 2.0f);
+                centre *= BuildingBuilder.storyDimensions;
+                if (Math.Min(l.h, l.w) < 4)
+                {
+                    b.AddBuilding(new SimpleBuilding(centre, Math.Min(l.h, l.w), new Vector2((float)l.w, (float)l.h)));
+                }
+                else { }
+            }
+
         }
     }
 }
