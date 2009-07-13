@@ -91,6 +91,7 @@ namespace Cityscape
             h = splitPoint;
             return new Tuple<Lot, Road>(lot,road);
         }
+
     }
 
 
@@ -104,6 +105,8 @@ namespace Cityscape
         
         static Color lot = Color.Blue;
         static Dictionary<Road.Type, Color> roadColors = null;
+        static int maxSize = 60;
+        static int maxRatio = 5;
 
         public static IGraphicsDeviceService deviceService
         {
@@ -218,15 +221,42 @@ namespace Cityscape
                 }
                 lots.AddRange(newLots);
                 roads.AddRange(newRoads);
-                foreach(Lot l in lots)
-                    AddLot(ref textureData, l);
-                foreach (Road r in roads)
-                    AddRoad(ref textureData, r);
-
-                city.SetData<Color>(textureData);
-                city.Save("city"+splits.ToString()+".png", ImageFileFormat.Png);
             }
 
+            bool done = false;
+            do
+            {
+                done = true;
+                List<Lot> newLots = new List<Lot>();
+                List<Road> newRoads = new List<Road>();
+                foreach (Lot l in lots)
+                {
+                    if (l.w > maxSize || (l.w / l.h) > maxRatio)
+                    {
+                        Tuple<Lot, Road> t = l.SplitH(2, 2);
+                        t.Second.type = Road.Type.Path;
+                        if (t.First.w != 0)
+                        {
+                            newLots.Add(t.First);
+                            newRoads.Add(t.Second);
+                        }
+                        done = false;
+                    }
+                    if (l.h > maxSize || (l.h / l.w) > maxRatio)
+                    {
+                        Tuple<Lot, Road> t = l.SplitV(2, 2);
+                        t.Second.type = Road.Type.Path;
+                        if (t.First.w != 0)
+                        {
+                            newLots.Add(t.First);
+                            newRoads.Add(t.Second);
+                        }
+                        done = false;
+                    }
+                }
+                lots.AddRange(newLots);
+                roads.AddRange(newRoads);
+            } while (!done);
 
             
             foreach(Lot l in lots)
@@ -243,11 +273,43 @@ namespace Cityscape
                                               0.0f,
                                               (float)(l.y) + (float)(l.h) / 2.0f);
                 centre *= BuildingBuilder.storyDimensions;
-                if (Math.Min(l.h, l.w) < 4)
+                int stories = Math.Max(l.h, l.w);
+                Vector2 baseDimensions = new Vector2((float)l.w, (float)l.h);
+                IBuilding bldg = null;
+                if (Math.Min(l.h, l.w) < 8)
                 {
-                    b.AddBuilding(new SimpleBuilding(centre, Math.Min(l.h, l.w), new Vector2((float)l.w, (float)l.h)));
+                    bldg = new SimpleBuilding(centre, stories, baseDimensions);
                 }
-                else { }
+                else
+                {
+                    switch(rand.Next(5))
+                    {
+                        case 0:
+                        case 1: 
+                            bldg = new ClassicBuilding(centre, stories, baseDimensions, 3, 1, stories / 2,
+                                (float)(0.5 * rand.NextDouble() + 0.5), (float)(0.25 * rand.NextDouble() + 0.75),
+                                2.0f, 1.0f + (float)(rand.NextDouble() * 0.2));
+                            break;
+                        case 2:
+                            bldg = new UglyModernBuilding(centre, stories, baseDimensions);
+                            break;
+                        case 3:
+                            if (Math.Min(l.h, l.w) < 16)
+                            {
+                                bldg = new UglyModernBuilding(centre, stories, baseDimensions);
+                            }
+                            else
+                            {
+                                bldg = new SimpleCylinderBuilding(centre, stories, baseDimensions);
+                            }
+                            break;
+                        case 4:
+                            bldg = new SimpleBuilding(centre, stories, baseDimensions);
+                            break;
+                    }
+                }
+
+                b.AddBuilding(bldg);
             }
 
         }
