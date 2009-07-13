@@ -52,7 +52,7 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
     float atten = 1 / (LightDistance * distance(Light0Position, input.Position));
     float dist = length(viewPosition);
     
-    output.Fogging = 1 / (0.1f * dist);
+    output.Fogging = 1 / (0.05f * dist);
     output.Diffuse = (diffuse) + Ambient;
 
     return output;
@@ -62,7 +62,7 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 {
     float4 col = tex2D(smpBld, input.Tex0) * float4(input.Mod, 0.0f);
     
-    float4 fogColour = float4(0.0f, 0.0f, 0.1f, 0.0f);
+    float4 fogColour = float4(0.0f, 0.0f, 0.2f, 0.0f);
     return lerp(fogColour, input.Diffuse * col, input.Fogging);
 }
 

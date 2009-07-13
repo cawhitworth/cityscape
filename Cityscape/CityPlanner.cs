@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Cityscape
@@ -10,8 +11,10 @@ namespace Cityscape
     public class Road
     {
         public enum Orientation { Horizontal, Vertical };
+        public enum Type { DualCarriageway, Major, Minor, Path };
         public int x, y;
         public Orientation orientation;
+        public Type type;
         public int width, length;
     }
 
@@ -88,6 +91,7 @@ namespace Cityscape
             h = splitPoint;
             return new Tuple<Lot, Road>(lot,road);
         }
+
     }
 
 
@@ -100,7 +104,9 @@ namespace Cityscape
         static IGraphicsDeviceService deviceService_ = null;
         
         static Color lot = Color.Blue;
-        static Color road = Color.Gray;
+        static Dictionary<Road.Type, Color> roadColors = null;
+        static int maxSize = 60;
+        static int maxRatio = 5;
 
         public static IGraphicsDeviceService deviceService
         {
@@ -133,16 +139,32 @@ namespace Cityscape
                     Plot(ref data, px, py, color);
         }
 
-        static void AddRoad(ref Color[] data, Road r)
+        static void BuildRoadColors()
         {
-            if (r.orientation == Road.Orientation.Horizontal)
-                AddRect(ref data, r.x, r.y, r.length, r.width, road);
-            else
-                AddRect(ref data, r.x, r.y, r.width, r.length, road);
+            roadColors = new Dictionary<Road.Type, Color>();
+            roadColors[Road.Type.DualCarriageway] = Color.DarkRed;
+            roadColors[Road.Type.Major] = Color.Yellow;
+            roadColors[Road.Type.Minor] = Color.Gray;
+            roadColors[Road.Type.Path] = Color.DarkBlue;
         }
 
-        public static void BuildCity()
+        static void AddRoad(ref Color[] data, Road r)
         {
+            if (roadColors == null)
+                BuildRoadColors();
+            if (r.orientation == Road.Orientation.Horizontal)
+                AddRect(ref data, r.x, r.y, r.length, r.width, roadColors[r.type]);
+            else
+                AddRect(ref data, r.x, r.y, r.width, r.length, roadColors[r.type]);
+        }
+
+        public static void BuildCity(BuildingBatch b)
+        {
+            Texture2D city = new Texture2D(deviceService_.GraphicsDevice, width, height);
+            Color[] textureData = new Color[width * height];
+            city.GetData<Color>(textureData);
+            for(int i=0; i<width*height; i++) textureData[i] = Color.Black;
+
             List<Lot> lots = new List<Lot>();
             List<Road> roads = new List<Road>();
 
@@ -150,12 +172,29 @@ namespace Cityscape
 
             int count = 0, notSplit = 0, splitFail = 0;
             int roadWidth = 16;
+            Road.Type roadType = Road.Type.DualCarriageway;
             for(int splits = 0; splits < 50; splits++)
             {
                 List<Lot> newLots = new List<Lot>();
                 List<Road> newRoads = new List<Road>();
-                
-                if (splits % 20 == 0) roadWidth /= 2;
+
+                switch(splits)
+                {
+                    case 5:
+                        roadWidth = 8;
+                        roadType = Road.Type.Major;
+                        break;
+                    case 10:
+                        roadWidth = 4;
+                        roadType = Road.Type.Minor;
+                        break;
+                    case 15:
+                        roadWidth = 2;
+                        break;
+                    case 35:
+                        roadType = Road.Type.Path;
+                        break;
+                }
 
                 foreach (Lot l in lots)
                 {
@@ -170,6 +209,7 @@ namespace Cityscape
                     {
                         count++;
                         Tuple<Lot, Road> t = l.Split(2, roadWidth);
+                        t.Second.type = roadType;
                         if (t.First.w != 0)
                         {
                             newLots.Add(t.First);
@@ -183,10 +223,41 @@ namespace Cityscape
                 roads.AddRange(newRoads);
             }
 
-            Texture2D city = new Texture2D(deviceService_.GraphicsDevice, width, height);
-            Color[] textureData = new Color[width * height];
-            city.GetData<Color>(textureData);
-            for(int i=0; i<width*height; i++) textureData[i] = Color.Black;
+            bool done = false;
+            do
+            {
+                done = true;
+                List<Lot> newLots = new List<Lot>();
+                List<Road> newRoads = new List<Road>();
+                foreach (Lot l in lots)
+                {
+                    if (l.w > maxSize || (l.w / l.h) > maxRatio)
+                    {
+                        Tuple<Lot, Road> t = l.SplitH(2, 2);
+                        t.Second.type = Road.Type.Path;
+                        if (t.First.w != 0)
+                        {
+                            newLots.Add(t.First);
+                            newRoads.Add(t.Second);
+                        }
+                        done = false;
+                    }
+                    if (l.h > maxSize || (l.h / l.w) > maxRatio)
+                    {
+                        Tuple<Lot, Road> t = l.SplitV(2, 2);
+                        t.Second.type = Road.Type.Path;
+                        if (t.First.w != 0)
+                        {
+                            newLots.Add(t.First);
+                            newRoads.Add(t.Second);
+                        }
+                        done = false;
+                    }
+                }
+                lots.AddRange(newLots);
+                roads.AddRange(newRoads);
+            } while (!done);
+
             
             foreach(Lot l in lots)
                 AddLot(ref textureData, l);
@@ -195,6 +266,52 @@ namespace Cityscape
 
             city.SetData<Color>(textureData);
             city.Save("city.png", ImageFileFormat.Png);
+
+            foreach(Lot l in lots)
+            {
+                Vector3 centre = new Vector3( (float)(l.x) + (float)(l.w) / 2.0f,
+                                              0.0f,
+                                              (float)(l.y) + (float)(l.h) / 2.0f);
+                centre *= BuildingBuilder.storyDimensions;
+                int stories = Math.Max(l.h, l.w);
+                Vector2 baseDimensions = new Vector2((float)l.w, (float)l.h);
+                IBuilding bldg = null;
+                if (Math.Min(l.h, l.w) < 8)
+                {
+                    bldg = new SimpleBuilding(centre, stories, baseDimensions);
+                }
+                else
+                {
+                    switch(rand.Next(5))
+                    {
+                        case 0:
+                        case 1: 
+                            bldg = new ClassicBuilding(centre, stories, baseDimensions, 3, 1, stories / 2,
+                                (float)(0.5 * rand.NextDouble() + 0.5), (float)(0.25 * rand.NextDouble() + 0.75),
+                                2.0f, 1.0f + (float)(rand.NextDouble() * 0.2));
+                            break;
+                        case 2:
+                            bldg = new UglyModernBuilding(centre, stories, baseDimensions);
+                            break;
+                        case 3:
+                            if (Math.Min(l.h, l.w) < 16)
+                            {
+                                bldg = new UglyModernBuilding(centre, stories, baseDimensions);
+                            }
+                            else
+                            {
+                                bldg = new SimpleCylinderBuilding(centre, stories, baseDimensions);
+                            }
+                            break;
+                        case 4:
+                            bldg = new SimpleBuilding(centre, stories, baseDimensions);
+                            break;
+                    }
+                }
+
+                b.AddBuilding(bldg);
+            }
+
         }
     }
 }

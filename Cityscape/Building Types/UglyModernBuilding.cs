@@ -69,7 +69,7 @@ namespace Cityscape
 
             yPos2 = yPos + ySize - 1;
             xPos2 = xPos + 1 + BuildingBuilder.rand.Next(xSize / 2);
-            ySize2 = BuildingBuilder.rand.Next(baseWidth - (yPos2 + 1)) + 2;
+            ySize2 = BuildingBuilder.rand.Next(baseHeight - (yPos2 + 1)) + 2;
             maxXSize = (xSize - 2) - (xPos2 - xPos) + 1;
             xSize2 = maxXSize / 2 + BuildingBuilder.rand.Next(maxXSize / 2);
 
