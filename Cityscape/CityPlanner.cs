@@ -101,19 +101,16 @@ namespace Cityscape
         static int width = 1024;
 
         static Random rand = new Random();
-        static IGraphicsDeviceService deviceService_ = null;
         
         static Color lot = Color.Blue;
         static Dictionary<Road.Type, Color> roadColors = null;
         static int maxSize = 60;
         static int maxRatio = 5;
+        static Texture2D city = null;
 
-        public static IGraphicsDeviceService deviceService
+        public static Texture2D streetMap
         {
-            set
-            {
-                deviceService_ = value;
-            }
+            get { return city; }
         }
 
         static Color Get(ref Color[] data, int x, int y)
@@ -158,9 +155,12 @@ namespace Cityscape
                 AddRect(ref data, r.x, r.y, r.width, r.length, roadColors[r.type]);
         }
 
-        public static void BuildCity(BuildingBatch b)
+        public static void BuildCity(Game1 game)
         {
-            Texture2D city = new Texture2D(deviceService_.GraphicsDevice, width, height);
+            IGraphicsDeviceService deviceService = (IGraphicsDeviceService) game.Services.GetService(typeof(IGraphicsDeviceService));
+
+            if (city == null)
+                city = new Texture2D(deviceService.GraphicsDevice, width, height);
             Color[] textureData = new Color[width * height];
             city.GetData<Color>(textureData);
             for(int i=0; i<width*height; i++) textureData[i] = Color.Black;
@@ -267,6 +267,8 @@ namespace Cityscape
             city.SetData<Color>(textureData);
             city.Save("city.png", ImageFileFormat.Png);
 
+            IBuildingBatch b = (IBuildingBatch)game.Services.GetService(typeof(IBuildingBatch));
+            
             foreach(Lot l in lots)
             {
                 Vector3 centre = new Vector3( (float)(l.x) + (float)(l.w) / 2.0f,

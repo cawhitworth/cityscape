@@ -29,13 +29,29 @@ namespace Cityscape
         Vector2 textPos;
         BuildingBatch buildings;
         ParticleBatch particles;
-        Color backgroundCol = new Color(0.0f, 0.0f, 0.1f);
+        Landscape landscape;
+        Color backgroundCol = new Color(0.0f, 0.0f, 0.2f);
         static Random rand = new Random();
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+
+            FrameCounter fc = new FrameCounter(this);
+            Components.Add(fc);
+            Services.AddService(typeof(IFrameCounter), fc);
+            
+            buildings = new BuildingBatch(this);
+            Components.Add(buildings);
+            Services.AddService(typeof(IBuildingBatch), buildings);
+
+            particles = new ParticleBatch(this);
+            Components.Add(particles);
+            Services.AddService(typeof(IParticleService), particles);
+
+            landscape = new Landscape(this);
+            Components.Add(landscape);
         }
 
         /// <summary>
@@ -46,26 +62,13 @@ namespace Cityscape
         /// </summary>
         protected override void Initialize()
         {
-            FrameCounter fc = new FrameCounter(this);
-            Components.Add(fc);
-            Services.AddService(typeof(IFrameCounter), fc);
             frameCounterService = (IFrameCounter) Services.GetService(typeof(IFrameCounter));
-
-            buildings = new BuildingBatch(this);
-            Components.Add(buildings);
-
-            particles = new ParticleBatch(this);
-            Components.Add(particles);
-            Services.AddService(typeof(IParticleService), particles);
-
-            CityPlanner.deviceService = (IGraphicsDeviceService)Services.GetService(typeof(IGraphicsDeviceService));
-            CityPlanner.BuildCity(buildings);
-
+            
             Stopwatch s;
             s = Stopwatch.StartNew();
-            IBuilding bldg;
-            int stories;
-            
+
+            CityPlanner.BuildCity(this);
+            landscape.streetMap = CityPlanner.streetMap; 
 #if (false)
             for(int x=-20; x<21; x++)
                 for (int y=-20; y <21; y++)

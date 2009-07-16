@@ -100,6 +100,7 @@
     <Compile Include="Camera.cs" />
     <Compile Include="CityPlanner.cs" />
     <Compile Include="FrameCounter.cs" />
+    <Compile Include="Landscape.cs" />
     <Compile Include="LightTextureGenerator.cs" />
     <Compile Include="ParticleBatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

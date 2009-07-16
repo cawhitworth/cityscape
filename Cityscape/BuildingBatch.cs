@@ -14,10 +14,15 @@ using Microsoft.Xna.Framework.Storage;
 
 namespace Cityscape
 {
+    public interface IBuildingBatch
+    {
+        void AddBuilding(IBuilding b);
+    }
     /// <summary>
     /// This is a game component that implements IUpdateable.
     /// </summary>
-    public class BuildingBatch : Microsoft.Xna.Framework.DrawableGameComponent
+    public class BuildingBatch : Microsoft.Xna.Framework.DrawableGameComponent,
+                                 IBuildingBatch
     {
         // Members
         Effect effect;
@@ -26,8 +31,8 @@ namespace Cityscape
         static Texture2D bldTex;
         int count = 0;
 
-        List<VertexPositionNormalTextureMod[]> vertices = new List<VertexPositionNormalTextureMod[]>();
         List<short[]> indices = new List<short[]>();
+        List<VertexPositionNormalTextureMod[]> vertices = new List<VertexPositionNormalTextureMod[]>();
         List<IBuilding> buildings = new List<IBuilding>();
 
         // Services needed
